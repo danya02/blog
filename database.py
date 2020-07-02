@@ -1,6 +1,7 @@
 from peewee import *
 import hashlib
 import hmac
+import datetime
 
 from Crypto import Random
 from Crypto.Cipher import AES
@@ -56,6 +57,7 @@ class Article(MyModel):
     slug = CharField()
     title = TextField()
     subtitle = TextField()
+    date = DateTimeField(default=datetime.datetime.now)
     author = ForeignKeyField(Author, backref='articles')
     listed = BooleanField()
 
