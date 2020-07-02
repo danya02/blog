@@ -1,5 +1,6 @@
 from peewee import *
 import hashlib
+import hmac
 
 from Crypto import Random
 from Crypto.Cipher import AES
@@ -16,6 +17,23 @@ class Author(MyModel):
     slug = CharField()
     name = TextField()
     description = TextField()
+    is_editor = BooleanField()
+
+    password = BlobField()
+    salt = BlobField()
+
+    def set_password(self, password):
+        self.salt = Random.new().read(AES.block_size)
+        self.password = hashlib.scrypt(bytes(password, 'utf-8'), salt=self.salt, n=2**12, r=8, p=8)
+        if not self.check_password(password):
+            raise ValueError('failed to trial authenticate')
+        self.save()
+
+    def check_password(self, password):
+        password = bytes(password, 'utf-8')
+        test_password = hashlib.scrypt(password, salt=self.salt, n=2**12, r=8, p=8)
+        return hmac.compare_digest(self.password, test_password)
+
 
 # AES code from https://stackoverflow.com/a/20868265
 
@@ -76,7 +94,7 @@ class Article(MyModel):
 
     def encrypt_in_place(self, password, salt=None, n_exp=10, r=8, p=1, magic_prefix=b'Article content: \n\n', magic_suffix=b'\n\n=== Article content ends here'):
         salt = salt or Random.new().read(64)
-        key = hashlib.scrypt(password, salt=salt, n=2**n_exp, r=r, p=p, dklen=32)
+        key = hashlib.scrypt(bytes(password, 'utf-8'), salt=salt, n=2**n_exp, r=r, p=p, dklen=32)
         plaintext = self.content
         ciphertext = encrypt(plaintext, key)
 
