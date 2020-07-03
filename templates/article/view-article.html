@@ -1,0 +1,21 @@
+{% extends "master.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+<article>
+    <header>
+        <h1>{{article.title|safe}}</h1>
+        {% if article.subtitle %}<h2>{{article.subtitle|safe}}</h2>{% endif %}
+        <p>Posted by {{article.author.name|safe}} at {{article.date.ctime()}}</p>
+        {% if tags %}
+        <p>Tags:
+          {% for arttag in tags %}
+          <a href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>{% if not loop.last %},{% endif %}
+          {% endfor %}
+        </p>
+        {% endif %}
+    </header>
+
+    {{ article_body|safe }}
+</article>
+{% endblock %}

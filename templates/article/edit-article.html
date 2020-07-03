@@ -1,0 +1,31 @@
+{% extends "master.html" %}
+{% block title %}{{ article.title }}{% endblock %}
+
+{% block body %}
+<form method="post">
+<article>
+    <header>
+          <h1><input type="text" required name="title" value="{{(article.title or '')|safe}}" /></h1>
+          <h2><input name="subtitle" type="text" value="{{(article.subtitle or '')|safe}}" /></h2>
+          <p>Posted by
+            <select name="author">
+              {% for author in authors %}
+              <option value="{{author.slug}}" {% if (article.author_id != None) and (author==article.author) %}selected{% endif %}>{{author.name|safe}}</option>
+              {% endfor %}
+            </select>
+            at <input name="time" type="time" value="{{time}}" /> <input name="date" type="date" value="{{date}}"/></p>
+          <p>Tags:
+            <input type="text" name="tags" value="{% for arttag in tags %}{{arttag.slug}}{% if not loop.last %},{% endif %}{% endfor %}" />
+          </p>
+          <p>Is article listed: <input type="checkbox" name="listed" checked /></p>
+          <p>TODO: encryption options</p>
+          <input type="submit">
+      </header>
+
+      <textarea name="content" rows="24" cols="80">{{ article_body|safe }}</textarea>
+
+      <input type="hidden" name="version" value="{{ article.version }}" />
+
+  </article>
+</form>
+{% endblock %}

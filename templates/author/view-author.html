@@ -1,0 +1,8 @@
+{% extends "master.html" %}
+{% block title %}{{author.name}}{% endblock %}
+
+{% block body %}
+<h1>{{author.name}}</h1>
+<p>{{ author.description | safe }}</p>
+<p>TODO: article list</p>
+{% endblock %}

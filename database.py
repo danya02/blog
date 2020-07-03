@@ -2,6 +2,7 @@ from peewee import *
 import hashlib
 import hmac
 import datetime
+import uuid
 
 from Crypto import Random
 from Crypto.Cipher import AES
@@ -15,7 +16,7 @@ class MyModel(Model):
         database = db
 
 class Author(MyModel):
-    slug = CharField()
+    slug = CharField(unique=True)
     name = TextField()
     description = TextField()
     is_editor = BooleanField()
@@ -54,12 +55,13 @@ def decrypt(ciphertext, key):
     return plaintext.rstrip(b"\0")
 
 class Article(MyModel):
-    slug = CharField()
+    slug = CharField(unique=True)
     title = TextField()
-    subtitle = TextField()
+    subtitle = TextField(null=True)
     date = DateTimeField(default=datetime.datetime.now)
     author = ForeignKeyField(Author, backref='articles')
     listed = BooleanField()
+    version = UUIDField(default=uuid.uuid4)
 
     encrypted = BooleanField()
     salt = BlobField(null=True)
@@ -115,6 +117,15 @@ class Article(MyModel):
             raise ValueError('Failed to trial decrypt content')
         self.save()
 
+
+class Tag(MyModel):
+    slug = CharField(unique=True)
+
+class ArticleTag(MyModel):
+    article = ForeignKeyField(Article, backref='tags')
+    tag = ForeignKeyField(Tag, backref='articles')
+
+
 db.connect()
-db.create_tables([Author, Article])
+db.create_tables([Author, Article, Tag, ArticleTag])
 db.close()
