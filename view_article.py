@@ -1,5 +1,6 @@
 from flask import Blueprint, render_template, abort, request, redirect, url_for
 from database import *
+import uuid
 import auth
 
 article_blueprint = Blueprint('article', __name__, template_folder='templates/article')
@@ -39,8 +40,11 @@ def edit_article(slug):
         if not article.encrypted:
             time = article.date.time().strftime('%H:%M:%S')
             date = article.date.date().strftime('%Y-%m-%d')
+            tags = [i.tag for i in article.tags.join(Tag)]
+
             return render_template('edit-article.html', article=article, authors=Author.select(),
-                                    article_body=str(article.content or b'', 'utf-8'), time=time, date=date)
+                                    article_body=str(article.content or b'', 'utf-8'), time=time, date=date,
+                                    tags=tags)
         else:
             return render_template('unlock-article.html', article=article)
     elif request.method == 'POST':
@@ -90,6 +94,7 @@ def edit_article(slug):
                     return render_template('edit-article.html', article=article, authors=Author.select(), wrong_version=True,
                                             time=time, date=date, article_body=str(article.content, 'utf-8'), tags=tags)
 
+                article.version = uuid.uuid4()
                 article.save(force_insert=create)
                 for func in after_save:
                     func()
