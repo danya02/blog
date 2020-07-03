@@ -100,7 +100,7 @@ class Article(MyModel):
         salt = salt or Random.new().read(64)
         key = hashlib.scrypt(bytes(password, 'utf-8'), salt=salt, n=2**n_exp, r=r, p=p, dklen=32)
         plaintext = self.content
-        ciphertext = encrypt(plaintext, key)
+        ciphertext = encrypt(magic_prefix + plaintext + magic_suffix, key)
 
         self.encrypted = True
         self.content = ciphertext
@@ -124,6 +124,8 @@ class Tag(MyModel):
 class ArticleTag(MyModel):
     article = ForeignKeyField(Article, backref='tags')
     tag = ForeignKeyField(Tag, backref='articles')
+    class Meta:
+        primary_key = CompositeKey('article', 'tag')
 
 
 db.connect()

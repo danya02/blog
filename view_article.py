@@ -4,15 +4,26 @@ import auth
 
 article_blueprint = Blueprint('article', __name__, template_folder='templates/article')
 
-@article_blueprint.route('/<slug>')
+@article_blueprint.route('/<slug>', methods=['GET', 'POST'])
 def view_article(slug):
-    # TODO: support encryption
     try:
         article = Article.get(Article.slug == slug)
     except Article.DoesNotExist:
         return 'no such article', 404
     tags = [i.tag for i in article.tags.join(Tag)]
-    return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=str(article.content, 'utf-8'))
+    if not article.encrypted:
+        return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=str(article.content, 'utf-8'))
+    else:
+        if request.method == 'GET':
+            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
+        elif request.method == 'POST':
+            try:
+                content = article.decrypt(request.form['password'])
+            except ValueError:
+                return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
+            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=str(content, 'utf-8'), protected=True)
+
+
 
 @article_blueprint.route('/<slug>/edit', methods=['GET', 'POST'])
 def edit_article(slug):
@@ -25,52 +36,77 @@ def edit_article(slug):
         create = True
 
     if request.method == 'GET':
-        time = article.date.time().strftime('%H:%M:%S')
-        date = article.date.date().strftime('%Y-%m-%d')
-        return render_template('edit-article.html', article=article, authors=Author.select(),
-                               article_body=str(article.content or b'', 'utf-8'), time=time, date=date)
+        if not article.encrypted:
+            time = article.date.time().strftime('%H:%M:%S')
+            date = article.date.date().strftime('%Y-%m-%d')
+            return render_template('edit-article.html', article=article, authors=Author.select(),
+                                    article_body=str(article.content or b'', 'utf-8'), time=time, date=date)
+        else:
+            return render_template('unlock-article.html', article=article)
     elif request.method == 'POST':
-        with db.atomic():
-            after_save = []
-            article.content = request.form.get('content') or article.content
-            article.title = request.form.get('title') or article.title
-            article.subtitle = request.form.get('subtitle') or article.subtitle
+        if request.form['action'] == 'edit':
+            with db.atomic():
+                after_save = []
+                article.content = request.form.get('content') or article.content
+                article.title = request.form.get('title') or article.title
+                article.subtitle = request.form.get('subtitle') or article.subtitle
 
+                try:
+                    author = Author.get(Author.slug == (request.form.get('author') or ''))
+                    article.author = author
+                except Author.DoesNotExist:
+                    pass
+
+                def add_tags():
+                    for tag in (request.form.get('tags') or '').split(','):
+                        tag = tag.strip()
+                        tag_row, _ = Tag.get_or_create(slug=tag)
+                        ArticleTag.get_or_create(tag=tag_row, article=article)
+
+                after_save.append(add_tags)
+
+                time = request.form.get('time') or article.date.time().strftime('%H:%M:%S')
+                date = request.form.get('date') or article.date.date().strftime('%Y-%m-%d')
+
+                article.date = datetime.datetime.fromisoformat(date + 'T' + time)
+                article.listed = request.form.get('listed')=='on' or article.listed
+
+                article.content = bytes(request.form.get('content'), 'utf-8') or article.content
+
+                article.encrypted = False
+                password = request.form.get('password') or ''
+                if password != '':
+                    after_save.append(lambda: article.encrypt_in_place(password))
+
+                version = request.form.get('version') or ''
+                if (version != str(article.version)) and not create:
+                    tags = []
+                    class Null:
+                        pass
+                    for tag in (request.form.get('tags') or '').split(','):
+                        obj = Null()
+                        obj.slug = tag
+                        tags.append(obj)
+                    return render_template('edit-article.html', article=article, authors=Author.select(), wrong_version=True,
+                                            time=time, date=date, article_body=str(article.content, 'utf-8'), tags=tags)
+
+                article.save(force_insert=create)
+                for func in after_save:
+                    func()
+                return redirect(url_for('article.view_article', slug=slug))
+        elif request.form['action'] == 'unlock':
             try:
-                author = Author.get(Author.slug == (request.form.get('author') or ''))
-                article.author = author
-            except Author.DoesNotExist:
-                pass
+                content = article.decrypt(request.form['password'])
+            except ValueError:
+                return render_template('unlock-article.html', article=article, error=True)
+            time = article.date.time().strftime('%H:%M:%S')
+            date = article.date.date().strftime('%Y-%m-%d')
+            tags = [i.tag for i in article.tags.join(Tag)]
 
-            if not create:
-                after_save.append(
-                    lambda: ArticleTag.delete().where(ArticleTag.article == article))
+            return render_template('edit-article.html', article=article, authors=Author.select(),
+                                    article_body=str(content or b'', 'utf-8'), time=time, date=date,
+                                    password=request.form['password'], tags=tags)
 
-            def add_tags():
-                for tag in (request.form.get('tags') or '').split(','):
-                    tag = tag.strip()
-                    tag_row, _ = Tag.get_or_create(slug=tag)
-                    ArticleTag.create(tag=tag_row, article=article)
-
-            after_save.append(add_tags)
-
-            time = request.form.get('time') or article.date.time().strftime('%H:%M:%S')
-            date = request.form.get('date') or article.date.date().strftime('%Y-%m-%d')
-
-            article.date = datetime.datetime.fromisoformat(date + 'T' + time)
-            article.listed = request.form.get('listed')=='on' or article.listed
-
-            article.encrypted = False
-            article.content = request.form.get('content') or article.content
-
-            version = request.form.get('version') or ''
-            if (version != article.version) and not create:
-                return render_template('edit-article.html', article=article, authors=Author.select())
-
-            article.save(force_insert=create)
-            for func in after_save:
-                func()
-            return redirect(url_for('article.view_article', slug=slug))
 
 @article_blueprint.route('/tag/<tag>')
 def articles_by_tag(tag):

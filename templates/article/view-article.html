@@ -6,16 +6,29 @@
     <header>
         <h1>{{article.title|safe}}</h1>
         {% if article.subtitle %}<h2>{{article.subtitle|safe}}</h2>{% endif %}
-        <p>Posted by {{article.author.name|safe}} at {{article.date.ctime()}}</p>
+        <p>Posted by <a href="{{url_for('author.view_author', slug=article.author.slug)}}">{{article.author.name|safe}}</a> at {{article.date.ctime()}}</p>
         {% if tags %}
         <p>Tags:
           {% for arttag in tags %}
           <a href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>{% if not loop.last %},{% endif %}
           {% endfor %}
         </p>
+        {% if protected %}<p>This article is encrypted!</p>{% endif %}
         {% endif %}
     </header>
 
+    {% if encrypted %}
+
+    {% if error %}<h2>Error while decrypting! Check password!</h2>{% endif %}
+    <h1>This article is encrypted! Enter password to decrypt:</h1>
+    <form method="post">
+      <input name="password" type="password" />
+      <input type="submit" />
+
+    {% else %}
+
     {{ article_body|safe }}
+
+    {% endif %}
 </article>
 {% endblock %}
