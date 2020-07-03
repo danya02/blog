@@ -18,7 +18,8 @@
           <p>Tags:
             <input type="text" name="tags" value="{% for arttag in tags %}{{arttag.slug}}{% if not loop.last %},{% endif %}{% endfor %}" />
           </p>
-          <p>Is article listed: <input type="checkbox" name="listed" checked /></p>
+          <p>Is article listed: <input type="checkbox" name="listed" {{ 'checked' if article.is_listed }} /></p>
+          <p>Source code is written in this format: <input type="text" name="format" value="{{article.format}}" /> </p>
           <p>Encryption password (leave empty for unencrypted): <input type="password" name="password" value="{{password}}" /></p>
           <input type="submit">
       </header>

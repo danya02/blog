@@ -4,6 +4,11 @@
     <title>{% block title %}{% endblock %}</title>
   </head>
   <body>
+    <header>
+      <h1>My Blog</h1>
+      <p>Fetch the <a href="{{ url_for('fetch_database') }}">latest database backup</a> (<a href="https://sqlite.org/index.html">SQLite</a> file format)</p>
+      <hr><hr>
+    </header>
 
     {% block body %}{% endblock %}
 

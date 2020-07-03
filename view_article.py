@@ -2,8 +2,13 @@ from flask import Blueprint, render_template, abort, request, redirect, url_for
 from database import *
 import uuid
 import auth
+import pypandoc
 
 article_blueprint = Blueprint('article', __name__, template_folder='templates/article')
+
+def pandoc_article(article):
+    return pypandoc.convert_text(article.content, 'html', article.format)
+
 
 @article_blueprint.route('/<slug>', methods=['GET', 'POST'])
 def view_article(slug):
@@ -13,7 +18,7 @@ def view_article(slug):
         return 'no such article', 404
     tags = [i.tag for i in article.tags.join(Tag)]
     if not article.encrypted:
-        return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=str(article.content, 'utf-8'))
+        return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article))
     else:
         if request.method == 'GET':
             return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
@@ -22,7 +27,8 @@ def view_article(slug):
                 content = article.decrypt(request.form['password'])
             except ValueError:
                 return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
-            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=str(content, 'utf-8'), protected=True)
+            article.content = content  # because pandoc_article takes an Article. we don't save this, so it's fine.
+            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), protected=True)
 
 
 
@@ -76,6 +82,7 @@ def edit_article(slug):
                 article.listed = request.form.get('listed')=='on' or article.listed
 
                 article.content = bytes(request.form.get('content'), 'utf-8') or article.content
+                article.format = request.form.get('format') or article.format
 
                 article.encrypted = False
                 password = request.form.get('password') or ''

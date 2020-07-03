@@ -60,8 +60,9 @@ class Article(MyModel):
     subtitle = TextField(null=True)
     date = DateTimeField(default=datetime.datetime.now)
     author = ForeignKeyField(Author, backref='articles')
-    listed = BooleanField()
+    listed = BooleanField(default=True)
     version = UUIDField(default=uuid.uuid4)
+    format = CharField(default='md')
 
     encrypted = BooleanField()
     salt = BlobField(null=True)
