@@ -3,6 +3,8 @@ from database import *
 from view_article import article_blueprint
 from view_author import author_blueprint
 from view_authentication import auth_blueprint
+from view_file import file_blueprint
+
 import traceback
 import pypandoc
 
@@ -14,6 +16,7 @@ app.secret_key = b'super secret super spoopy'
 app.register_blueprint(article_blueprint, url_prefix='/article')
 app.register_blueprint(author_blueprint, url_prefix='/author')
 app.register_blueprint(auth_blueprint, url_prefix='/login')
+app.register_blueprint(file_blueprint, url_prefix='/file')
 
 
 @app.route('/')
