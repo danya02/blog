@@ -58,6 +58,10 @@ def edit_article(slug):
         article = Article()
         article.slug = slug
         create = True
+    if create and not auth.can_create():
+        return abort(403)
+    if not create and not auth.can_edit(article):
+        return abort(403)
 
     if request.method == 'GET':
         if not article.encrypted:

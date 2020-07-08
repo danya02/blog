@@ -18,11 +18,13 @@ app.register_blueprint(auth_blueprint, url_prefix='/login')
 
 @app.route('/')
 def index():
-    return 'Hello Blogging!'
+    return render_template('master.html')
 
 @app.route('/database-backup.sqlite')
 def fetch_database():
-    return send_file(DB_PATH)
+    file = DB_PATH+'.backup'
+    db.execute_sql('vacuum into ?;', (file, ))
+    return send_file(file)
 
 @app.route('/pandoc', methods=['GET', 'POST'])
 def pandoc_debug():

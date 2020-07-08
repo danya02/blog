@@ -9,11 +9,15 @@ def view_author(slug):
     try:
         author = Author.get(Author.slug == slug)
     except Author.DoesNotExist:
-        return 'no such author'
-    return render_template('view-author.html', author=author)
+        if auth.can_edit_user(slug):
+            return redirect(url_for('author.edit_author', slug=slug))
+        return abort(404)
+    return render_template('view-author.html', author=author, can_edit=auth.can_edit_user(slug))
 
 @author_blueprint.route('/<slug>/edit', methods=['GET', 'POST'])
 def edit_author(slug):
+    if not auth.can_edit_user(slug):
+        return abort(403)
     no_change = 'D0N-tChangeTh3Curr3ntPassw0rd'
     create = False
     try:
@@ -24,7 +28,7 @@ def edit_author(slug):
         author.slug = slug
 
     if request.method == 'GET':
-        return render_template('edit-author.html', author=author, no_change=no_change)
+        return render_template('edit-author.html', author=author, no_change=no_change, can_change_editor=auth.can_change_editor_status(slug))
 
     elif request.method == 'POST':
         after_save = []
@@ -34,7 +38,8 @@ def edit_author(slug):
             after_save.append(lambda:
                 author.set_password(request.form['password']))
         author.description = request.form['description']
-        author.is_editor = request.form.get('editor') == 'on'
+        if auth.can_change_editor_status(slug):
+            author.is_editor = request.form.get('editor') == 'on'
 
         with db.atomic():
             author.password = b''

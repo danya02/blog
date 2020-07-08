@@ -2,7 +2,16 @@
 {% block title %}{{author.name}}{% endblock %}
 
 {% block body %}
-<h1>{{author.name}}</h1>
-<p>{{ author.description | safe }}</p>
-<p>TODO: article list</p>
+<article>
+  <header>
+  <h1>{{author.name}}</h1>
+  {% if can_edit %}
+  <p><a href="{{url_for('author.edit_author', slug=author.slug)}}">Edit author</a></p>
+  {% endif %}
+  </header>
+  <p>{{ author.description | safe }}</p>
+  <hr>
+  <hr>
+  <p>TODO: article list</p>
+</article>
 {% endblock %}
