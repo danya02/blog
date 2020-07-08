@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, request, redirect, url_for
+from flask import Blueprint, render_template, abort, request, redirect, url_for, Response
 from database import *
 import uuid
 import auth
@@ -15,7 +15,7 @@ def view_article(slug):
     try:
         article = Article.get(Article.slug == slug)
     except Article.DoesNotExist:
-        return 'no such article', 404
+        return abort(404)
     tags = [i.tag for i in article.tags.join(Tag)]
     if not article.encrypted:
         return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article))
@@ -30,7 +30,24 @@ def view_article(slug):
             article.content = content  # because pandoc_article takes an Article. we don't save this, so it's fine.
             return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), protected=True)
 
-
+@article_blueprint.route('/<slug>/source', methods=['GET', 'POST'])
+def view_article_source(slug):
+    try:
+        article = Article.get(Article.slug == slug)
+    except Article.DoesNotExist:
+        return abort(404)
+    tags = [i.tag for i in article.tags.join(Tag)]
+    if not article.encrypted:
+        return Response(article.content, mimetype='text/plain')
+    else:
+        if request.method == 'GET':
+            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
+        elif request.method == 'POST':
+            try:
+                content = article.decrypt(request.form['password'])
+            except ValueError:
+                return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
+            return Response(content, mimetype='text/plain')
 
 @article_blueprint.route('/<slug>/edit', methods=['GET', 'POST'])
 def edit_article(slug):

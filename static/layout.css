@@ -89,5 +89,15 @@ body {
     .navbar-toggle {
         display: none;
     }
+}
 
+@keyframes highlight-fade {
+  from {background-color: #ff0;}
+  to {background-color: #fff;}
+}
+
+
+.highlighted {
+  animation: highlight-fade 2s;
+  background-color: #fff;
 }

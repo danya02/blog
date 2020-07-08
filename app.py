@@ -10,6 +10,7 @@ import pypandoc
 application = Flask(__name__)
 app = application
 
+app.secret_key = b'super secret super spoopy'
 app.register_blueprint(article_blueprint, url_prefix='/article')
 app.register_blueprint(author_blueprint, url_prefix='/author')
 app.register_blueprint(auth_blueprint, url_prefix='/login')

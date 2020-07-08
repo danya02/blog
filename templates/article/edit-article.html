@@ -5,7 +5,7 @@
 <form method="post">
 <article>
     <header>
-        {% if wrong_version %}<h1>Wrong version of article submitted! Check live content to avoid overwriting edits!</h1>{% endif %}
+        {% if wrong_version %}<h1 class="highlight">Wrong version of article submitted! Check live content to avoid overwriting edits!</h1>{% endif %}
           <h1><input type="text" required name="title" value="{{(article.title or '')|safe}}" /></h1>
           <h2><input name="subtitle" type="text" value="{{(article.subtitle or '')|safe}}" /></h2>
           <p>Posted by
