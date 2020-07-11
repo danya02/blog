@@ -13,6 +13,13 @@ def authenticate(username, password):
         raise ValueError('password invalid')
     session['user'] = username
 
+def is_editor():
+    if get_user() is None:
+        return False
+
+    user = Author.get(Author.slug == get_user())
+    return user.is_editor
+
 def can_edit(article):
     if get_user() is None:
         return False

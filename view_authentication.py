@@ -14,7 +14,7 @@ def authenticate():
             return render_template('login.html', error=e.args[0])
         return redirect(url_for('index'))
 
-@auth_blueprint.route('/logout')
+@auth_blueprint.route('/logout/')
 def logout():
     auth.logout()
     return redirect(url_for('index'))

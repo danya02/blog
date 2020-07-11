@@ -16,10 +16,7 @@
         </p>
         {% if protected %}<p>This article is encrypted!</p>{% endif %}
         {% endif %}
-        <p class="noprint"><a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a>
-        {% if can_edit %}
-        <p class="noprint"><a href="{{url_for('article.edit_article', slug=article.slug)}}">Edit article</a>
-        {% endif %}
+        <p class="noprint"><a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a> {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
     </header>
 
     {% if encrypted %}

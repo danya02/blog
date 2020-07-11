@@ -1,0 +1,10 @@
+{% extends "master.html" %}
+{% block title %}Creation tools{% endblock %}
+
+{% block body %}
+<p><a href="{{url_for('article.create_article')}}">Create article</a></p>
+<p><a href="{{url_for('file.create_file')}}">Create file</a></p>
+{% if is_editor %}
+<p><a href="{{url_for('author.create_author')}}">Create author</a></p>
+{% endif %}
+{% endblock %}

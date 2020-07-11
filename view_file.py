@@ -41,11 +41,11 @@ def view_file(uuid):
             # not setting cache-control or etag because this is in response to a POST
             return resp
 
-@file_blueprint.route('/create')
+@file_blueprint.route('/create/')
 def create_file():
     return redirect(url_for('file.edit_file', uuid=str(uuid.uuid4())))
 
-@file_blueprint.route('/<uuid:uuid>/edit', methods=['GET', 'POST'])
+@file_blueprint.route('/<uuid:uuid>/edit/', methods=['GET', 'POST'])
 def edit_file(uuid):
     if not auth.can_create():
         return abort(403)

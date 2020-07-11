@@ -4,7 +4,11 @@ import auth
 
 author_blueprint = Blueprint('author', __name__, template_folder='templates/author')
 
-@author_blueprint.route('/<slug>')
+@author_blueprint.route('/list')
+def list_authors():
+    return render_template('list-authors.html', authors=Author.select())
+
+@author_blueprint.route('/<slug>/')
 def view_author(slug):
     try:
         author = Author.get(Author.slug == slug)
@@ -14,7 +18,12 @@ def view_author(slug):
         return abort(404)
     return render_template('view-author.html', author=author, can_edit=auth.can_edit_user(slug))
 
-@author_blueprint.route('/<slug>/edit', methods=['GET', 'POST'])
+@author_blueprint.route('/create/')
+def create_author():
+    return redirect(url_for('author.edit_author', slug=str(uuid.uuid4())))
+
+
+@author_blueprint.route('/<slug>/edit/', methods=['GET', 'POST'])
 def edit_author(slug):
     if not auth.can_edit_user(slug):
         return abort(403)

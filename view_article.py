@@ -10,7 +10,7 @@ def pandoc_article(article):
     return pypandoc.convert_text(article.content, 'html', article.format)
 
 
-@article_blueprint.route('/<slug>', methods=['GET', 'POST'])
+@article_blueprint.route('/<slug>/', methods=['GET', 'POST'])
 def view_article(slug):
     try:
         article = Article.get(Article.slug == slug)
@@ -30,7 +30,7 @@ def view_article(slug):
             article.content = content  # because pandoc_article takes an Article. we don't save this, so it's fine.
             return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), protected=True)
 
-@article_blueprint.route('/<slug>/source', methods=['GET', 'POST'])
+@article_blueprint.route('/<slug>/source/', methods=['GET', 'POST'])
 def view_article_source(slug):
     try:
         article = Article.get(Article.slug == slug)
@@ -49,7 +49,11 @@ def view_article_source(slug):
                 return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
             return Response(content, mimetype='text/plain')
 
-@article_blueprint.route('/<slug>/edit', methods=['GET', 'POST'])
+@article_blueprint.route('/create/')
+def create_article():
+    return redirect(url_for('article.edit_article', slug=str(uuid.uuid4())))
+
+@article_blueprint.route('/<slug>/edit/', methods=['GET', 'POST'])
 def edit_article(slug):
     create = False
     try:
@@ -81,6 +85,7 @@ def edit_article(slug):
                 article.content = request.form.get('content') or article.content
                 article.title = request.form.get('title') or article.title
                 article.subtitle = request.form.get('subtitle') or article.subtitle
+                article.slug = request.form.get('slug') or article.slug
 
                 try:
                     author = Author.get(Author.slug == (request.form.get('author') or ''))
@@ -126,7 +131,7 @@ def edit_article(slug):
                 article.save(force_insert=create)
                 for func in after_save:
                     func()
-                return redirect(url_for('article.view_article', slug=slug))
+                return redirect(url_for('article.view_article', slug=article.slug))
         elif request.form['action'] == 'unlock':
             try:
                 content = article.decrypt(request.form['password'])
@@ -139,6 +144,18 @@ def edit_article(slug):
             return render_template('edit-article.html', article=article, authors=Author.select(),
                                     article_body=str(content or b'', 'utf-8'), time=time, date=date,
                                     password=request.form['password'], tags=tags)
+
+@article_blueprint.route('/<slug>/delete', methods=['POST'])
+def delete_article(slug):
+    try:
+        article = Article.get(Article.slug == slug)
+    except Article.DoesNotExist:
+        return redirect(url_for('article.edit_article', slug=slug))
+
+    if request.form['confirm'] == 'on':
+        article.delete_instance()
+        return redirect(url_for('index'))
+    return redirect(url_for('article.edit_article', slug=slug))
 
 
 @article_blueprint.route('/tag/<tag>')
