@@ -1,0 +1,12 @@
+{% extends "master.html" %}
+{% block title %}Author list{% endblock %}
+
+{% block body %}
+<article>
+  <h1>List of authors</h1>
+  {% for a in authors %}
+  <h3><a href="{{url_for('author.view_author', slug=a.slug)}}">{{a.name}}</a></h3>
+  <hr>
+  {% endfor %}
+</article>
+{% endblock %}

@@ -3,27 +3,35 @@ from database import *
 from view_article import article_blueprint
 from view_author import author_blueprint
 from view_authentication import auth_blueprint
+from view_file import file_blueprint
+
 import traceback
 import pypandoc
+
+import auth
 
 
 application = Flask(__name__)
 app = application
 
+app.secret_key = b'super secret super spoopy'
 app.register_blueprint(article_blueprint, url_prefix='/article')
 app.register_blueprint(author_blueprint, url_prefix='/author')
 app.register_blueprint(auth_blueprint, url_prefix='/login')
+app.register_blueprint(file_blueprint, url_prefix='/file')
 
 
 @app.route('/')
 def index():
-    return 'Hello Blogging!'
+    return render_template('master.html')
 
 @app.route('/database-backup.sqlite')
 def fetch_database():
-    return send_file(DB_PATH)
+    file = DB_PATH+'.backup'
+    db.execute_sql('vacuum into ?;', (file, ))
+    return send_file(file)
 
-@app.route('/pandoc', methods=['GET', 'POST'])
+@app.route('/pandoc/', methods=['GET', 'POST'])
 def pandoc_debug():
     if request.method == 'GET':
         return render_template('pandoc-debug.html', format='md', source='Write your markup here...')
@@ -34,7 +42,11 @@ def pandoc_debug():
         except:
             return render_template('pandoc-debug.html', format=request.form['format'], source=request.form['source'], error=traceback.format_exc())
 
-
+@app.route('/creation-tools/')
+def creation_tools():
+    if auth.can_create():
+        return render_template('creation-tools.html', is_editor=auth.is_editor())
+    return abort(403)
 
 
 

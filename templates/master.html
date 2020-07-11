@@ -4,6 +4,11 @@
     <title>{% block title %}{% endblock %}</title>
     <link rel="stylesheet" href="{{url_for('static', filename='article-styles.css')}}" type="text/css" />
     <link rel="stylesheet" href="{{url_for('static', filename='layout.css')}}" type="text/css" />
+    <!-- highlight.js -->
+    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css" media="screen">
+    <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
+    <script>hljs.initHighlightingOnLoad();</script>
+    <!-- end highlight.js -->
   </head>
   <style>
 {% set first_hue = range(0, 360, 15)|random %}
@@ -21,7 +26,12 @@
         <ul class="main-nav" id="js-menu">
           <a href="{{url_for('pandoc_debug')}}">Pandoc</a>
           <a href="{{url_for('fetch_database')}}">Database backup</a>
+          {% if session['user'] %}
+          <a href="{{url_for('creation_tools')}}">Creation tools</a>
+          <a href="{{url_for('auth.logout')}}">Hello {{session['user']}} (logout?)</a>
+          {% else %}
           <a href="{{url_for('auth.authenticate')}}">Login</a>
+          {% endif %}
         </ul>
     </nav>
 

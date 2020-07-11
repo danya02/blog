@@ -7,7 +7,7 @@
   <p>Name: <input type="text" name="name" required value="{{ author.name or '' }}"/></p>
   <p>Slug: <input type="text" name="slug" required value="{{ author.slug }}"/></p>
   <p>Password: <input type="password" required name="password" value="{{no_change if author.password else ''}}"/></p>
-  <p>Is editor: <input type="checkbox" name="editor" {{'checked' if author.is_editor else ''}} />
+  <p>Is editor: <input type="checkbox" name="editor" {{'checked' if author.is_editor else ''}} {{'disabled="disabled"' if not can_change_editor else ''}}/>
   <p>Description: </p>
   <textarea name="description" rows="24" cols="80">{{ author.description | safe }}</textarea>
 

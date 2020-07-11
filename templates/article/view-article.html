@@ -6,25 +6,22 @@
     <header>
         <h1>{{article.title|safe}}</h1>
         {% if article.subtitle %}<h2>{{article.subtitle|safe}}</h2>{% endif %}
-        <p>Posted by <a href="{{url_for('author.view_author', slug=article.author.slug)}}">{{article.author.name|safe}}</a> at {{article.date.ctime()}}</p>
+        <p class="nolink">Posted by <a href="{{url_for('author.view_author', slug=article.author.slug)}}">{{article.author.name|safe}}</a> at {{article.date.ctime()}}</p>
+        <p>Original markup language: <code>{{article.format}}</code></p>
         {% if tags %}
-        <p>Tags:
+        <p class="nolink">Tags:
           {% for arttag in tags %}
           <a href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>{% if not loop.last %},{% endif %}
           {% endfor %}
         </p>
         {% if protected %}<p>This article is encrypted!</p>{% endif %}
         {% endif %}
-	{% if can_edit %}
-	  <form action="{{ url_for('article.edit_article', slug=article.slug) }}">
-            <input type="submit" value="Edit article" />
-	  </form>
-	{% endif %}
+        <p class="noprint"><a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a> {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
     </header>
 
     {% if encrypted %}
 
-    {% if error %}<h2>Error while decrypting! Check password!</h2>{% endif %}
+    {% if error %}<div class="highlighted"><h3>Error while decrypting! Check password!</h3></div>{% endif %}
     <h1>This article is encrypted! Enter password to decrypt:</h1>
     <form method="post">
       <input name="password" type="password" />
