@@ -14,8 +14,8 @@
           <a href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>{% if not loop.last %},{% endif %}
           {% endfor %}
         </p>
-        {% if protected %}<p>This article is encrypted!</p>{% endif %}
         {% endif %}
+        {% if protected %}<p>This article is encrypted!</p>{% endif %}
         <p class="noprint"><a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a> {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
     </header>
 
@@ -33,6 +33,6 @@
 
     {% endif %}
     {% from "article/disqus-plugin.html" import disqus %}
-    {{ disqus(article.slug, '') }}
+    {{ disqus(article.slug, request.base_url) }}
 </article>
 {% endblock %}

@@ -11,7 +11,7 @@ var init_disqus = function(){
 	window.localStorage.setItem('disqus_enabled', 'yes');
 	document.getElementById('comments-section').innerHTML = String.raw`<p>Comments by <a href="https://disqus.com/?ref_noscript">Disqus</a> are enabled. <button onclick="deinit_disqus();">Click here to disable.</button></p><div id="disqus_thread"></div>`;
 	var disqus_config = function () {
-	//this.page.url = PAGE_URL;  // Replace PAGE_URL with your page's canonical URL variable
+	this.page.url = "{{url}}"
 	this.page.identifier = "{{slug}}";
 	};
 

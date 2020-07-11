@@ -62,7 +62,7 @@ body {
     display: none;
 }
 
-@media screen and (min-width: 768px) {
+@media screen and (min-width: 800px) {
     .navbar {
         display: flex;
         justify-content: space-between;
@@ -89,7 +89,18 @@ body {
     .navbar-toggle {
         display: none;
     }
+    article {
+      margin: 0 auto;
+      width: 70%;
+    }
 }
+
+@media screen and (max-width: 800px) {
+  article {
+    max-width: 99% !important;
+  }
+}
+
 
 @keyframes highlight-fade {
   from {background-color: #ff0;}

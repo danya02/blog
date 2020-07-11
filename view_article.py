@@ -95,9 +95,10 @@ def edit_article(slug):
 
                 def add_tags():
                     for tag in (request.form.get('tags') or '').split(','):
-                        tag = tag.strip()
-                        tag_row, _ = Tag.get_or_create(slug=tag)
-                        ArticleTag.get_or_create(tag=tag_row, article=article)
+                        if tag:
+                            tag = tag.strip()
+                            tag_row, _ = Tag.get_or_create(slug=tag)
+                            ArticleTag.get_or_create(tag=tag_row, article=article)
 
                 after_save.append(add_tags)
 
