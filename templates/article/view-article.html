@@ -35,5 +35,7 @@
     {{ article_body|safe }}
 
     {% endif %}
+    {% from "article/disqus-plugin.html" import disqus %}
+    {{ disqus(article.slug, '') }}
 </article>
 {% endblock %}
