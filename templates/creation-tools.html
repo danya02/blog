@@ -7,4 +7,9 @@
 {% if is_editor %}
 <p><a href="{{url_for('author.create_author')}}">Create author</a></p>
 {% endif %}
+<hr><hr>
+<p>Current database size: {{db_size}} bytes == {{db_size|filesizeformat}}</p>
+<form action="{{url_for('vacuum_db')}}" method="post">
+<input type="submit" value="Vacuum database!" />
+</form>
 {% endblock %}

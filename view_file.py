@@ -36,7 +36,7 @@ def view_file(uuid):
             except ValueError:
                 return render_template('unlock-file.html', file=file, error=True)
             resp = Response(content)
-            resp.headers.content_type = file.mimetype
+            resp.content_type = file.mimetype
             resp.headers.set('Content-Disposition', 'attachment', filename=file.filename)
             # not setting cache-control or etag because this is in response to a POST
             return resp
@@ -70,10 +70,10 @@ def edit_file(uuid):
                 return render_template('unlock-file.html', file=file, error=True)
             return render_template('edit-file.html', file=file, password=request.form['password'])
         elif request.form['action'] == 'edit':
-            file_sent = request.files.get('content') is not None
-            if file_sent:
-                file.set_content(request.files['content'].stream.read())
-            file.mimetype = request.form['mimetype'] or (request.files['content'].mimetype if file_sent else None) or file.mimetype or 'application/octet-stream'
+            file_content = request.files.get('content').read()
+            if file_content:
+                file.set_content(file_content)
+            file.mimetype = request.form['mimetype'] or (request.files['content'].mimetype if file_content else None) or file.mimetype or 'application/octet-stream'
 
             try:
                 file.decrypt_in_place(request.form.get('old_password'))
@@ -82,6 +82,18 @@ def edit_file(uuid):
 
             if request.form.get('password'):
                 file.encrypt_in_place(request.form['password'])
-            file.filename = request.form['filename'] or (request.files['content'].filename if file_sent else None) or file.filename or 'untitled.bin'
+            file.filename = request.form['filename'] or (request.files['content'].filename if file_content else None) or file.filename or 'untitled.bin'
             file.save(force_insert=create)
             return redirect(url_for('file.edit_file', uuid=uuid))
+
+@file_blueprint.route('/<uuid:uuid>/delete', methods=['POST'])
+def delete_file(uuid):
+    try:
+        file = File.get(File.uuid == uuid)
+    except File.DoesNotExist:
+        return redirect(url_for('file.edit_file', uuid=uuid))
+
+    if request.form['confirm'] == 'on':
+        file.delete_instance()
+        return redirect(url_for('index'))
+    return redirect(url_for('file.edit_file', uuid=uuid))

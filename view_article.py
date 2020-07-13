@@ -41,12 +41,12 @@ def view_article_source(slug):
         return Response(article.content, mimetype='text/plain')
     else:
         if request.method == 'GET':
-            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
+            return render_template('view-article.html', unlock_source=True, article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
         elif request.method == 'POST':
             try:
                 content = article.decrypt(request.form['password'])
             except ValueError:
-                return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
+                return render_template('view-article.html', unlock_source=True, article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
             return Response(content, mimetype='text/plain')
 
 @article_blueprint.route('/create/')

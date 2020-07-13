@@ -1,10 +1,11 @@
-from flask import Flask, send_file, request, render_template
+from flask import Flask, send_file, request, render_template, redirect, url_for
 from database import *
 from view_article import article_blueprint
 from view_author import author_blueprint
 from view_authentication import auth_blueprint
 from view_file import file_blueprint
 
+import os
 import traceback
 import pypandoc
 
@@ -45,10 +46,15 @@ def pandoc_debug():
 @app.route('/creation-tools/')
 def creation_tools():
     if auth.can_create():
-        return render_template('creation-tools.html', is_editor=auth.is_editor())
+        return render_template('creation-tools.html', is_editor=auth.is_editor(), db_size=os.path.getsize(DB_PATH))
     return abort(403)
 
-
+@app.route('/vacuum', methods=['POST'])
+def vacuum_db():
+    if not auth.can_create():
+        return abort(403)
+    db.execute_sql('vacuum;')
+    return redirect(url_for('creation_tools'))
 
 if __name__ == '__main__':
     app.run('0.0.0.0', 5000, debug=True)

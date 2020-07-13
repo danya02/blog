@@ -129,7 +129,7 @@ class ArticleTag(MyModel):
         primary_key = CompositeKey('article', 'tag')
 
 class File(MyModel):
-    uuid = UUIDField(default=uuid.uuid4)
+    uuid = UUIDField(default=uuid.uuid4, unique=True)
     filename = CharField()
     mimetype = CharField()
     hash = CharField(unique=True)
@@ -154,8 +154,6 @@ class File(MyModel):
         self.magic_prefix = None
         self.magic_suffix = None
         self.content = content
-
-
 
     def decrypt(self, password):
         if not self.encrypted:
@@ -198,7 +196,6 @@ class File(MyModel):
         # (should never be an issue)
         if plaintext != self.decrypt(password):
             raise ValueError('Failed to trial decrypt content')
-        self.save()
 
 
 

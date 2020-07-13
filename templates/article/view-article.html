@@ -16,13 +16,20 @@
         </p>
         {% endif %}
         {% if protected %}<p>This article is encrypted!</p>{% endif %}
-        <p class="noprint"><a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a> {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
+        <p class="noprint">
+          {% if unlock_source %}
+          <a href="{{url_for('article.view_article', slug=article.slug)}}">View rendered article</a>
+          {% else %}
+          <a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a>
+          {% endif %}
+          {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
     </header>
 
     {% if encrypted %}
 
     {% if error %}<div class="highlighted"><h3>Error while decrypting! Check password!</h3></div>{% endif %}
-    <h1>This article is encrypted! Enter password to decrypt:</h1>
+    <h1>This article is encrypted! Enter password to decrypt{% if unlock_source %} <span class="highlighted">this article's source code</span>{% endif %}:</h1>
+
     <form method="post">
       <input name="password" type="password" />
       <input type="submit" />
@@ -31,8 +38,9 @@
 
     {{ article_body|safe }}
 
-    {% endif %}
     {% from "article/disqus-plugin.html" import disqus %}
     {{ disqus(article.slug, request.base_url) }}
+
+    {% endif %}
 </article>
 {% endblock %}

@@ -12,7 +12,13 @@
 
 <input type="hidden" name="action" value="edit" />
 <input type="hidden" name="old_password" value="{{password}}" />
-
-
 </form>
+
+<hr><hr>
+<form method="post" action="{{url_for('file.delete_file', uuid=file.uuid)}}">
+  <p>Deleting a file cannot be undone! Are you sure? <input type="checkbox" required name="confirm" /></p>
+  <input type="submit" value="Delete this file!" />
+</form>
+
+
 {% endblock %}
