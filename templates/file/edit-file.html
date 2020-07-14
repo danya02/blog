@@ -6,7 +6,7 @@
 <p>File name (if empty, name on disk):<input type="text" name="filename" value="{{ file.filename or '' }}" /></p>
 <p>MIME type (if empty, will try to autodetect or default to <code>application/octet-stream</code>): <input name="mimetype" type="text" value="{{ file.mimetype or '' }}"/></p>
 <p>Encryption password (leave empty for unencrypted): <input type="password" name="password" value="{{password}}" /></p>
-<p>Currently stored content: <a href="{{url_for('file.view_file', uuid=file.uuid)}}">{{ (file.content or '').__len__()}} bytes</a>, SHA3-512 hash: <code>{{file.hash}}</code></p>
+<p>Currently stored content: <a href="{{url_for('file.view_file', uuid=file.uuid)}}">{{ (file.content or '').__len__()}} bytes == {{ (file.content or '').__len__()|filesizeformat }}</a>, SHA3-512 hash: <code>{{filehash(file.hash) | safe}}</code></p>
 <p>New content: <input type="file" name="content"></p>
 <input type="submit" />
 

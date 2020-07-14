@@ -2,10 +2,10 @@
 {% block title %}Creation tools{% endblock %}
 
 {% block body %}
-<p><a href="{{url_for('article.create_article')}}">Create article</a></p>
-<p><a href="{{url_for('file.create_file')}}">Create file</a></p>
+<p><a href="{{url_for('article.create_article')}}">Create article</a> or <a href="{{url_for('article.admin_article_list')}}">view article list</a></p>
+<p><a href="{{url_for('file.create_file')}}">Create file</a> or <a href="{{url_for('file.admin_file_list')}}">view file list</a></p>
 {% if is_editor %}
-<p><a href="{{url_for('author.create_author')}}">Create author</a></p>
+<p><a href="{{url_for('author.create_author')}}">Create author</a> or <a href="{{url_for('author.admin_author_list')}}">view author list</a></p>
 {% endif %}
 <hr><hr>
 <p>Current database size: {{db_size}} bytes == {{db_size|filesizeformat}}</p>

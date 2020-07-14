@@ -5,6 +5,19 @@ import auth
 
 file_blueprint = Blueprint('file', __name__, template_folder='templates/file')
 
+def filehash(hash):
+    hash = str(hash)
+    outp = ''
+    for i in range(0, len(hash), 8):
+        outp += hash[i:i + 8] + '<wbr>'
+    return outp
+
+@file_blueprint.route('/admin-list/')
+def admin_file_list():
+    if not auth.can_create():
+        return abort(403)
+    return render_template('admin-list-file.html', files=File.select(File.uuid, File.filename, File.mimetype, File.hash, File.encrypted), filehash=filehash)
+
 @file_blueprint.route('/<uuid:uuid>/', methods=['GET', 'POST'])
 def view_file(uuid):
     try:
@@ -59,7 +72,7 @@ def edit_file(uuid):
 
     if request.method == 'GET':
         if not file.encrypted:
-            return render_template('edit-file.html', file=file, password='')
+            return render_template('edit-file.html', file=file, password='', filehash=filehash)
         else:
             return render_template('unlock-file.html', file=file), 401
     elif request.method == 'POST':
@@ -68,7 +81,7 @@ def edit_file(uuid):
                 file.decrypt_in_place(request.form['password'])
             except ValueError:
                 return render_template('unlock-file.html', file=file, error=True)
-            return render_template('edit-file.html', file=file, password=request.form['password'])
+            return render_template('edit-file.html', file=file, password=request.form['password'], filehash=filehash)
         elif request.form['action'] == 'edit':
             file_content = request.files.get('content').read()
             if file_content:

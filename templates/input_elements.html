@@ -1,0 +1,3 @@
+{% macro view_checkbox(value) %}
+<input type="checkbox" {% if value==True %}checked="checked"{% endif %} disabled="disabled" />
+{% endmacro %}

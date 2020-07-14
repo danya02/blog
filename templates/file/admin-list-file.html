@@ -1,0 +1,18 @@
+{% extends "master.html" %}
+{% block title %}File list{% endblock %}
+
+{% block body %}
+<h1>File list</h1>
+<table>
+  {% from "input_elements.html" import view_checkbox %}
+  <tr><th>UUID</th><th>Filename</th><th>MIME type</th><th>Hash</th><th>Encrypted?</th></tr>
+  {% for file in files %}
+  <tr>
+    <td><a href="{{url_for('file.edit_file', uuid=file.uuid)}}"><code>{{file.uuid}}</code></a></td>
+    <td><code>{{file.filename}}</code></td>
+    <td><code>{{file.mimetype}}</code></td>
+    <td><a href="{{url_for('file.view_file', uuid=file.uuid)}}"><code>{{filehash(file.hash) | safe}}</code></a></td>
+    <td>{{view_checkbox(file.encrypted)}}</td>
+  </tr>
+  {% endfor %}
+{% endblock %}

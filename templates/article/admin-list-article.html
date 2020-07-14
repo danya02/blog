@@ -1,0 +1,20 @@
+{% extends "master.html" %}
+{% block title %}Article list{% endblock %}
+
+{% block body %}
+<h1>Article list</h1>
+<table>
+  {% from "input_elements.html" import view_checkbox %}
+  <tr><th>Slug</th><th>Title</th><th>Subtitle</th><th>Date</th><th>Author</th><th>Listed?</th><th>Encrypted?</th></tr>
+  {% for article in articles %}
+  <tr>
+    <td><a href="{{url_for('article.view_article', slug=article.slug)}}"><code>{{article.slug}}</code></a></td>
+    <td>{{article.title}}</td>
+    <td>{{article.subtitle or '[[no subtitle]]'}}</td>
+    <td>{{article.date.ctime()}}</td>
+    <td><a href="{{url_for('author.view_author', slug=article.author.slug)}}"><code>{{article.author.slug}}</code></a></td>
+    <td>{{view_checkbox(article.listed)}}</td>
+    <td>{{view_checkbox(article.encrypted)}}</td>
+  </tr>
+  {% endfor %}
+{% endblock %}

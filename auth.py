@@ -6,7 +6,10 @@ def get_user(db_row=False):
     try:
         user_row = Author.select().where(Author.slug == user).get()
     except Author.DoesNotExist:
-        del session['user']
+        try:
+            del session['user']
+        except KeyError:
+            pass
         return None
     if db_row:
         return user_row
@@ -36,7 +39,7 @@ def can_create():
     return get_user() is not None
 
 def can_edit_user(username):
-    if len(Author.select()) == 0:  # you need to be able to create a user
+    if len(Author.select().where(Author.is_editor)) == 0:  # you need to be able to create a user
         return True
     if (me:=get_user(True)) is not None:
         try:
@@ -47,7 +50,7 @@ def can_edit_user(username):
     return False
 
 def can_change_editor_status(username):
-    if len(Author.select()) == 0:  # you need to be able to create a user
+    if len(Author.select().where(Author.is_editor)) == 0:  # you need to be able to create a user
         return True
     if (me:=get_user(True)) is not None:
         try:

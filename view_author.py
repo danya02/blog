@@ -4,9 +4,16 @@ import auth
 
 author_blueprint = Blueprint('author', __name__, template_folder='templates/author')
 
-@author_blueprint.route('/list')
+@author_blueprint.route('/list/')
 def list_authors():
     return render_template('list-authors.html', authors=Author.select())
+
+@author_blueprint.route('/list/admin/')
+def admin_author_list():
+    if not auth.is_editor():
+        return abort(403)
+    return render_template('list-authors-admin.html', authors=Author.select())
+
 
 @author_blueprint.route('/<slug>/')
 def view_author(slug):
@@ -56,4 +63,4 @@ def edit_author(slug):
             author.save(force_insert=create)
             for func in after_save:
                 func()
-        return redirect(url_for('author.view_author', slug=slug))
+        return redirect(url_for('author.view_author', slug=author.slug))

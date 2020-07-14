@@ -29,6 +29,10 @@ def index():
 @app.route('/database-backup.sqlite')
 def fetch_database():
     file = DB_PATH+'.backup'
+    try:
+        os.unlink(file)
+    except FileNotFoundError:
+        pass
     db.execute_sql('vacuum into ?;', (file, ))
     return send_file(file)
 

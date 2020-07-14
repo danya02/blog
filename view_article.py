@@ -162,3 +162,9 @@ def delete_article(slug):
 @article_blueprint.route('/tag/<tag>')
 def articles_by_tag(tag):
     return 'List of articles by tag '+tag
+
+@article_blueprint.route('/admin_list/')
+def admin_article_list():
+    if not auth.can_create():
+        return abort(403)
+    return render_template('admin-list-article.html', articles=Article.select(Article.slug, Article.title, Article.subtitle, Article.author, Article.listed, Article.encrypted, Article.date).order_by(-Article.date))
