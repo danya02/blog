@@ -22,7 +22,9 @@
           <p>Is article listed: <input type="checkbox" name="listed" {{ 'checked' if article.listed }} /></p>
           <p>Source code is written in this format: <input type="text" name="format" value="{{article.format}}" /> </p>
           <p>Encryption password (leave empty for unencrypted): <input type="password" name="password" value="{{password}}" /></p>
-          <input type="submit">
+          <p>In previews, crop at paragraph: <input type="number" name="crop_at_paragraph" min="1" value="{{article.crop_at_paragraph}}" /></p>
+          <p>In previews, crop with fading: <input type="checkbox" name="crop_with_fade" {{ 'checked' if article.crop_with_fade }} /></p>
+          <input type="submit" />
       </header>
 
       <textarea name="content" rows="24" cols="80" required>{{ article_body|safe }}</textarea>

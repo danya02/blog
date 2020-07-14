@@ -110,6 +110,13 @@ def edit_article(slug):
 
                 article.content = bytes(request.form.get('content'), 'utf-8') or article.content
                 article.format = request.form.get('format') or article.format
+                try:
+                    crop = int(request.form.get('crop_at_paragraph'))
+                except:
+                    crop = article.crop_at_paragraph
+                article.crop_at_paragraph = crop
+
+                article.crop_with_fade = request.form.get('crop_with_fade')=='on'
 
                 article.encrypted = False
                 password = request.form.get('password') or ''

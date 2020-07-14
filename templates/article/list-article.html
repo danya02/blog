@@ -1,0 +1,52 @@
+{% extends "master.html" %}
+{% block title %}Articles{% endblock %}
+
+{% set pages_displayed=5 %}{# number of page links on either side of the current position #}
+
+{% macro page_indicator() %}
+<nav class="page-switcher" aria-label="Page navigation">
+  {% set first_num = max(1, cur_page-pages_displayed) %}
+  {% set last_num = min(last_page, cur_page+pages_displayed) %}
+  {% if 1 != first_num %}
+    {# we are too far from the start, so display an arrow instead. #}
+    <a class="page-link" href="{{goto_page(1)}}" aria-label="Go to page 1">&lArr;</a>
+  {% endif %}
+  {% for i in range(first_num, last_num+1) %}
+    {% if i!=cur_page %}
+    <a class="page-link" href="{{goto_page(i)}}" aria-label="Go to page {{i}}">{{i}}</a>
+    {% else %}
+    <span class="page-link active-page-link" aria-label="You are on page {{i}}">{{i}}</span>
+    {% endif %}
+  {% endfor %}
+
+  {% if last_page != last_num %}
+    {# we are too far from the end, so display an arrow instead. #}
+    <a class="page-link" href="{{goto_page(last_page)}}" aria-label="Go to last page">&rArr;</a>
+  {% endif %}
+</nav>
+{% endmacro %}
+{% block body %}
+<h1>Articles</h1>
+{{page_indicator()}}
+{% for article in articles %}
+<div class="article-preview">
+  <a href="{{url_for('article.view_article', slug=article.slug)}}">
+  <h1>{{article.title}}</h1>
+  {% if article.subtitle %}
+    <h2>{{article.subtitle}}</h2>
+  {% endif %}
+  <div class="article-preview-content {{'article-preview-fadeout' if do_fadeout(article) else ''}}">
+    {% if article.encrypted %}
+    [[ Content encrypted -- password required to view ]]
+    {% else %}
+    {{get_preview(article) | safe}}
+      {% if do_fadeout(article) %}
+        <div class="article-preview-fadeout-after"></div>
+      {% endif %}
+    {% endif %}
+  </div>
+  </a>
+</div>
+{% endfor %}
+{{page_indicator()}}
+{% endblock %}

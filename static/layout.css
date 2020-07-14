@@ -118,3 +118,43 @@ body {
     display: none !important;
   }
 }
+
+.article-preview {
+  margin: 16px;
+  border-radius: 8px;
+  border: solid black 1px;
+}
+
+.article-preview a {
+  text-decoration: none;
+}
+
+.article-preview a:link { color: black; }
+.article-preview a:visited { color: black; }
+.article-preview a:hover { color: black; }
+.article-preview a:active { color: black; }
+
+.article-preview h1, h2 {
+  margin-top: 0px;
+}
+
+.article-preview-content {
+  border-radius: 8px;
+  border: solid black 1px;
+  margin: 4px;
+  background-color: white;
+}
+
+.article-preview-fadeout {
+  position:relative;
+  /*height:150px;*/
+  overflow:hidden;
+}
+
+.article-preview-fadeout-after  {
+  position:absolute;
+  bottom:0;
+  height:6em;
+  width:100%;
+  background:linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) );
+}

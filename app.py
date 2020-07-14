@@ -8,9 +8,11 @@ from view_file import file_blueprint
 import os
 import traceback
 import pypandoc
+from math import ceil
 
 import auth
 
+ELEMENTS_PER_PAGE = 10
 
 application = Flask(__name__)
 app = application
@@ -22,9 +24,34 @@ app.register_blueprint(auth_blueprint, url_prefix='/login')
 app.register_blueprint(file_blueprint, url_prefix='/file')
 
 
+def do_fadeout(article):
+    if article.encrypted:
+        return False
+    return article.crop_with_fade
+
+def get_preview(article):
+    if article.encrypted:
+        return '<b>Content encrypted. Also there was a problem with this template, this is a bug!</b>'
+
+    source = b'\r\n\r\n'.join(article.content.split(b'\r\n\r\n')[0:article.crop_at_paragraph])
+
+    return pypandoc.convert_text(source, 'html', article.format)
+
 @app.route('/')
 def index():
-    return render_template('master.html')
+    query = Article.select().where(Article.listed).order_by(-Article.date)
+    cur_page = int(request.args.get('page') or 1)
+
+    def goto_page(num):
+        return url_for('index', page=num)
+
+    last_page = ceil(len(query)/ELEMENTS_PER_PAGE)
+    if cur_page > last_page:
+        return redirect(goto_page(last_page))
+    return render_template('article/list-article.html', articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
+                                                        do_fadeout=do_fadeout, get_preview=get_preview,
+                                                        cur_page=cur_page, last_page=last_page, goto_page=goto_page,
+                                                        max=max, min=min)
 
 @app.route('/database-backup.sqlite')
 def fetch_database():
@@ -53,7 +80,7 @@ def creation_tools():
         return render_template('creation-tools.html', is_editor=auth.is_editor(), db_size=os.path.getsize(DB_PATH))
     return abort(403)
 
-@app.route('/vacuum', methods=['POST'])
+@app.route('/vacuum/', methods=['POST'])
 def vacuum_db():
     if not auth.can_create():
         return abort(403)

@@ -63,6 +63,8 @@ class Article(MyModel):
     listed = BooleanField(default=True)
     version = UUIDField(default=uuid.uuid4)
     format = CharField(default='md')
+    crop_at_paragraph = IntegerField(default=3)
+    crop_with_fade = BooleanField(default=True)
 
     encrypted = BooleanField()
     salt = BlobField(null=True)
