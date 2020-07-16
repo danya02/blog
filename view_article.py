@@ -3,6 +3,7 @@ from database import *
 import uuid
 import auth
 import pypandoc
+from article_list_utils import *
 
 article_blueprint = Blueprint('article', __name__, template_folder='templates/article')
 
@@ -17,18 +18,28 @@ def view_article(slug):
     except Article.DoesNotExist:
         return abort(404)
     tags = [i.tag for i in article.tags.join(Tag)]
+    next_article = None
+    prev_article = None
+    try:
+        prev_article = Article.select(Article.slug).where(Article.listed).order_by(Article.date).where(Article.date > article.date).get()
+    except Article.DoesNotExist:
+        pass
+    try:
+        next_article = Article.select(Article.slug).where(Article.listed).order_by(-Article.date).where(Article.date < article.date).get()
+    except Article.DoesNotExist:
+        pass
     if not article.encrypted:
-        return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article))
+        return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), next_article=next_article, prev_article=prev_article)
     else:
         if request.method == 'GET':
-            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
+            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, next_article=next_article, prev_article=prev_article)
         elif request.method == 'POST':
             try:
                 content = article.decrypt(request.form['password'])
             except ValueError:
-                return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
+                return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True, next_article=next_article, prev_article=prev_article)
             article.content = content  # because pandoc_article takes an Article. we don't save this, so it's fine.
-            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), protected=True)
+            return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), protected=True, next_article=next_article, prev_article=prev_article)
 
 @article_blueprint.route('/<slug>/source/', methods=['GET', 'POST'])
 def view_article_source(slug):
@@ -75,7 +86,7 @@ def edit_article(slug):
 
             return render_template('edit-article.html', article=article, authors=Author.select(),
                                     article_body=str(article.content or b'', 'utf-8'), time=time, date=date,
-                                    tags=tags)
+                                    tags=tags, this_user=auth.get_user(True))
         else:
             return render_template('unlock-article.html', article=article)
     elif request.method == 'POST':
@@ -87,11 +98,15 @@ def edit_article(slug):
                 article.subtitle = request.form.get('subtitle') or article.subtitle
                 article.slug = request.form.get('slug') or article.slug
 
+                this_user = auth.get_user(True)
                 try:
                     author = Author.get(Author.slug == (request.form.get('author') or ''))
-                    article.author = author
+                    if this_user.is_editor:
+                        article.author = author
+                    else:
+                        article.author = this_user
                 except Author.DoesNotExist:
-                    pass
+                    article.author = this_user
 
                 def add_tags():
                     for tag in (request.form.get('tags') or '').split(','):
@@ -106,7 +121,7 @@ def edit_article(slug):
                 date = request.form.get('date') or article.date.date().strftime('%Y-%m-%d')
 
                 article.date = datetime.datetime.fromisoformat(date + 'T' + time)
-                article.listed = request.form.get('listed')=='on' or article.listed
+                article.listed = request.form.get('listed')=='on'
 
                 article.content = bytes(request.form.get('content'), 'utf-8') or article.content
                 article.format = request.form.get('format') or article.format
@@ -133,7 +148,8 @@ def edit_article(slug):
                         obj.slug = tag
                         tags.append(obj)
                     return render_template('edit-article.html', article=article, authors=Author.select(), wrong_version=True,
-                                            time=time, date=date, article_body=str(article.content, 'utf-8'), tags=tags)
+                                            time=time, date=date, article_body=str(article.content, 'utf-8'), tags=tags,
+                                            this_user=auth.get_user(True))
 
                 article.version = uuid.uuid4()
                 article.save(force_insert=create)
@@ -168,7 +184,23 @@ def delete_article(slug):
 
 @article_blueprint.route('/tag/<tag>')
 def articles_by_tag(tag):
-    return 'List of articles by tag '+tag
+    try:
+        tag = Tag.get(Tag.slug==tag)
+    except Tag.DoesNotExist:
+        return abort(404)
+    query = Article.select().join(ArticleTag).where(ArticleTag.tag == tag).where(Article.listed).order_by(-Article.date)
+    cur_page = int(request.args.get('page') or 1)
+
+    def goto_page(num):
+        return url_for('article.articles_by_tag', page=num)
+
+    last_page = ceil(len(query) / ELEMENTS_PER_PAGE)
+    if cur_page > last_page:
+        return redirect(goto_page(last_page))
+    return render_template('list-article.html', articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
+                                                do_fadeout=do_fadeout, get_preview=get_preview,
+                                                cur_page=cur_page, last_page=last_page, goto_page=goto_page,
+                                                max=max, min=min)
 
 @article_blueprint.route('/admin_list/')
 def admin_article_list():

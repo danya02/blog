@@ -10,9 +10,9 @@
           <h2>Subtitle: <input name="subtitle" type="text" value="{{(article.subtitle or '')|safe}}" /></h2>
           <p>Slug: <input name="slug" type="text" value="{{article.slug}}" /></p>
           <p>Posted by
-            <select name="author">
+            <select name="author" {% if not this_user.is_editor %}disabled{% endif %}>
               {% for author in authors %}
-              <option value="{{author.slug}}" {% if (article.author_id != None) and (author==article.author) %}selected{% endif %}>{{author.name|safe}}</option>
+              <option value="{{author.slug}}" {% if ((article.author_id != None) and (author==article.author)) or author==this_user %}selected{% endif %}>{{author.name|safe}}</option>
               {% endfor %}
             </select>
             at <input name="time" type="time" value="{{time}}" required /> <input name="date" type="date" value="{{date}}" required/></p>

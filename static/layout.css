@@ -139,8 +139,6 @@ body {
 }
 
 .article-preview-content {
-  border-radius: 8px;
-  border: solid black 1px;
   margin: 4px;
   background-color: white;
 }
@@ -157,4 +155,53 @@ body {
   height:6em;
   width:100%;
   background:linear-gradient( rgba(255, 255, 255, 0), rgba(255, 255, 255, 1) );
+}
+
+
+.article-title-font {
+  font-family:sans-serif;
+}
+
+.article-title-font * {
+  font-family:sans-serif;
+}
+
+#comments-section {
+  margin: 8px;
+  border: 1px solid black;
+}
+
+#disqus_thread {
+  margin: 4px;
+}
+
+.page-switcher {
+  border-radius: 0.5rem;
+  border: 1px black solid;
+  padding: 8px;
+  margin: 8px;
+  width: max-content;
+}
+
+.page-link {
+  text-decoration: none;
+}
+
+.page-link * {
+  font-family: sans-serif;
+  padding: 4px;
+  font-size: 1.5em;
+  border-radius: 0.25rem;
+  border: solid 1px black;
+  color: white;
+  background: #007bff;
+}
+
+a:visited.page-link * {
+  background: purple;
+}
+
+.active-page-link * {
+  background: #fff;
+  color: black;
 }

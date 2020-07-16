@@ -5,17 +5,35 @@
     <link rel="stylesheet" href="{{url_for('static', filename='article-styles.css')}}" type="text/css" />
     <link rel="stylesheet" href="{{url_for('static', filename='layout.css')}}" type="text/css" />
     <!-- highlight.js -->
-    <link rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css" media="screen">
+    <link async rel="stylesheet" href="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/styles/default.min.css" media="screen">
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
     <!-- end highlight.js -->
   </head>
   <style>
 {% set first_hue = range(0, 360, 15)|random %}
+{% set last_hue = first_hue + 60 %}
 
 .navbar {
-  background-image: linear-gradient(90deg, hsl({{first_hue}}, 100%, 25%), hsl({{first_hue + 60}}, 100%, 25%));
+  background-image: linear-gradient(90deg, hsl({{first_hue}}, 100%, 20%), hsl({{last_hue}}, 100%, 20%));
 }
+
+.color-as-navbar-start {
+  color: hsl({{first_hue}}, 100%, 25%);
+}
+.color-as-navbar-end {
+  color: hsl({{last_hue}}, 100%, 25%);
+}
+
+@media print {
+  .color-as-navbar-start {
+    color: black;
+  }
+  .color-as-navbar-end {
+    color: black;
+  }
+}
+
   </style>
   <body>
 

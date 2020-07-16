@@ -3,9 +3,9 @@
 
 {% block body %}
 <article>
-    <header>
-        <h1>{{article.title|safe}}</h1>
-        {% if article.subtitle %}<h2>{{article.subtitle|safe}}</h2>{% endif %}
+    <header class="article-title-font">
+        <h1 class="article-title-font color-as-navbar-start">{{article.title|safe}}</h1>
+        {% if article.subtitle %}<h2 class="article-title-font color-as-navbar-end">{{article.subtitle|safe}}</h2>{% endif %}
         <p class="nolink">Posted by <a href="{{url_for('author.view_author', slug=article.author.slug)}}">{{article.author.name|safe}}</a> at {{article.date.ctime()}}</p>
         <p>Original markup language: <code>{{article.format}}</code></p>
         {% if tags %}
@@ -16,6 +16,8 @@
         </p>
         {% endif %}
         {% if protected %}<p>This article is encrypted!</p>{% endif %}
+        {% if not article.listed %}<p>This article is unlisted!</p>{% endif %}
+
         <p class="noprint">
           {% if unlock_source %}
           <a href="{{url_for('article.view_article', slug=article.slug)}}">View rendered article</a>
@@ -23,6 +25,14 @@
           <a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a>
           {% endif %}
           {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
+          <p>
+            {% if prev_article %}
+              <a href="{{url_for('article.view_article', slug=prev_article.slug)}}">&lArr; Previous article</a>
+            {% endif %}
+            ||
+            {% if next_article %}
+              <a href="{{url_for('article.view_article', slug=next_article.slug)}}">Next article &rArr;</a>
+            {% endif %}
     </header>
 
     {% if encrypted %}

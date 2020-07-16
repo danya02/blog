@@ -8,11 +8,10 @@ from view_file import file_blueprint
 import os
 import traceback
 import pypandoc
-from math import ceil
+from article_list_utils import *
+
 
 import auth
-
-ELEMENTS_PER_PAGE = 10
 
 application = Flask(__name__)
 app = application
@@ -24,18 +23,6 @@ app.register_blueprint(auth_blueprint, url_prefix='/login')
 app.register_blueprint(file_blueprint, url_prefix='/file')
 
 
-def do_fadeout(article):
-    if article.encrypted:
-        return False
-    return article.crop_with_fade
-
-def get_preview(article):
-    if article.encrypted:
-        return '<b>Content encrypted. Also there was a problem with this template, this is a bug!</b>'
-
-    source = b'\r\n\r\n'.join(article.content.split(b'\r\n\r\n')[0:article.crop_at_paragraph])
-
-    return pypandoc.convert_text(source, 'html', article.format)
 
 @app.route('/')
 def index():

@@ -9,32 +9,32 @@
   {% set last_num = min(last_page, cur_page+pages_displayed) %}
   {% if 1 != first_num %}
     {# we are too far from the start, so display an arrow instead. #}
-    <a class="page-link" href="{{goto_page(1)}}" aria-label="Go to page 1">&lArr;</a>
+    <a class="page-link" href="{{goto_page(1)}}" aria-label="Go to page 1"><span>&lArr;</span></a>
   {% endif %}
   {% for i in range(first_num, last_num+1) %}
     {% if i!=cur_page %}
-    <a class="page-link" href="{{goto_page(i)}}" aria-label="Go to page {{i}}">{{i}}</a>
+    <a class="page-link" href="{{goto_page(i)}}" aria-label="Go to page {{i}}"><span>{{i}}</span></a>
     {% else %}
-    <span class="page-link active-page-link" aria-label="You are on page {{i}}">{{i}}</span>
+    <span class="page-link active-page-link" aria-label="You are on page {{i}}"><span>{{i}}</span></span>
     {% endif %}
   {% endfor %}
 
   {% if last_page != last_num %}
     {# we are too far from the end, so display an arrow instead. #}
-    <a class="page-link" href="{{goto_page(last_page)}}" aria-label="Go to last page">&rArr;</a>
+    <a class="page-link" href="{{goto_page(last_page)}}" aria-label="Go to last page"><span>&rArr;</span></a>
   {% endif %}
 </nav>
 {% endmacro %}
 {% block body %}
-<h1>Articles</h1>
 {{page_indicator()}}
 {% for article in articles %}
 <div class="article-preview">
   <a href="{{url_for('article.view_article', slug=article.slug)}}">
-  <h1>{{article.title}}</h1>
+  <h1 class="color-as-navbar-start article-title-font">{{article.title}}</h1>
   {% if article.subtitle %}
-    <h2>{{article.subtitle}}</h2>
+    <h2 class="color-as-navbar-end article-title-font">{{article.subtitle}}</h2>
   {% endif %}
+  <h4 class="article-title-font">Posted at {{article.date.ctime()}}</h4>
   <div class="article-preview-content {{'article-preview-fadeout' if do_fadeout(article) else ''}}">
     {% if article.encrypted %}
     [[ Content encrypted -- password required to view ]]

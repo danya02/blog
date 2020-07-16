@@ -9,9 +9,10 @@ html {
 
 article {
 /*  color: #444; */
-  font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;
-/*  font-size: 12px;
-  line-height: 1.7;
+  /*font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;*/
+  font-family: serif;
+  font-size: 18px;
+/*  line-height: 1.7;
   padding: 1em;
   margin: auto;
   max-width: 42em;
@@ -34,15 +35,15 @@ article header {
 }
 
 article header h1 {
-  font-size: 5em;
+  font-size: 3.5em;
 }
 
 article header h2 {
-  font-size: 3em;
+  font-size: 2.5em;
 }
 
 article header p {
-  font-size: 1.5em;
+  font-size: 1.2em;
   text-indent: 0;
 }
 
@@ -101,7 +102,7 @@ img {
 h1, h2, h3, h4, h5, h6 {
   color: #111;
   line-height: 125%;
-  margin-top: 1em;
+  margin-top: 0em;
   font-weight: normal;
 }
 
