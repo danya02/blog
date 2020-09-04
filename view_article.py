@@ -50,14 +50,23 @@ def view_article_source(slug):
     tags = [i.tag for i in article.tags.join(Tag)]
     if not article.encrypted:
         return Response(article.content, mimetype='text/plain')
+    try:
+        prev_article = Article.select(Article.slug).where(Article.listed).order_by(Article.date).where(Article.date > article.date).get()
+    except Article.DoesNotExist:
+        pass
+    try:
+        next_article = Article.select(Article.slug).where(Article.listed).order_by(-Article.date).where(Article.date < article.date).get()
+    except Article.DoesNotExist:
+        pass
+
     else:
         if request.method == 'GET':
-            return render_template('view-article.html', unlock_source=True, article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True)
+            return render_template('view-article.html', unlock_source=True, article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, next_article=next_article, prev_article=prev_article)
         elif request.method == 'POST':
             try:
                 content = article.decrypt(request.form['password'])
             except ValueError:
-                return render_template('view-article.html', unlock_source=True, article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True)
+                return render_template('view-article.html', unlock_source=True, article=article, tags=tags, can_edit=auth.can_edit(article), encrypted=True, protected=True, error=True, next_article=next_article, prev_article=prev_article)
             return Response(content, mimetype='text/plain')
 
 @article_blueprint.route('/create/')
@@ -167,7 +176,7 @@ def edit_article(slug):
 
             return render_template('edit-article.html', article=article, authors=Author.select(),
                                     article_body=str(content or b'', 'utf-8'), time=time, date=date,
-                                    password=request.form['password'], tags=tags)
+                                    password=request.form['password'], tags=tags, this_user=auth.get_user(True))
 
 @article_blueprint.route('/<slug>/delete', methods=['POST'])
 def delete_article(slug):
