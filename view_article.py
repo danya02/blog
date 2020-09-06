@@ -219,6 +219,19 @@ def articles_by_tag(tag):
                                                 last_page=last_page, goto_page=goto_page,
                                                 tag=tag.slug)
 
+@article_blueprint.route('/tag/<tag>/atom.xml')
+@article_blueprint.route('/tag/<tag>/atom/')
+@article_blueprint.route('/tag/<tag>/feed.xml')
+@article_blueprint.route('/tag/<tag>/feed/')
+def articles_by_tag_feed(tag):
+    try:
+        tag = Tag.get(Tag.slug==tag)
+    except Tag.DoesNotExist:
+        return abort(404)
+    query = Article.select().join(ArticleTag).join(Tag).where(ArticleTag.tag == tag).where(Article.listed).order_by(-Article.date).limit(5)
+    return Response(render_template('atom-syndication.xml', what_here=f'posts with tag "{tag.slug}"', url_here=url_for('article.articles_by_tag', tag=tag.slug,  _external=True), articles=list(query), get_content=get_content), mimetype='application/atom+xml')
+
+
 @article_blueprint.route('/admin_list/')
 def admin_article_list():
     if not auth.can_create():

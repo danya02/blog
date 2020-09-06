@@ -1,4 +1,4 @@
-from flask import Flask, send_file, request, render_template, redirect, url_for
+from flask import Flask, send_file, request, render_template, redirect, url_for, Response
 from database import *
 from view_article import article_blueprint
 from view_author import author_blueprint
@@ -38,6 +38,17 @@ def index():
     return render_template('article/list-article.html', articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
                                                         get_preview=get_preview, cur_page=cur_page,
                                                         last_page=last_page, goto_page=goto_page)
+
+@app.route('/atom.xml')
+@app.route('/atom/')
+@app.route('/feed.xml')
+@app.route('/feed/')
+def feed():
+    query = Article.select().where(Article.listed).order_by(-Article.date).limit(5)
+    return Response(render_template('atom-syndication.xml', what_here='all posts',
+                    url_here=url_for('index', _external=True), articles=list(query),
+                    get_content=get_content),
+                    mimetype='application/atom+xml')
 
 @app.route('/database-backup.sqlite')
 def fetch_database():

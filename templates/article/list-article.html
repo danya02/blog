@@ -17,6 +17,13 @@ Articles with <span class="badge badge-secondary">{{tag}}</span>
 Newest articles
 {% endif %}
 </h1>
+<p class="lead">Use this link in your feed reader:
+{% if tag %}
+<a href="{{url_for('article.articles_by_tag_feed', tag=tag, _external=True)}}"><code>{{url_for('article.articles_by_tag_feed', tag=tag, _external=True)}}</code></a>
+{% else %}
+<a href="{{url_for('feed', _external=True)}}"><code>{{url_for('feed', _external=True)}}</code></a>
+{% endif %}
+</p>
 {% for article in articles %}
 {{ view_article(article, get_preview) }}
 {% endfor %}

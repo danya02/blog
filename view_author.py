@@ -1,4 +1,4 @@
-from flask import Blueprint, render_template, abort, request, redirect, url_for
+from flask import Blueprint, render_template, abort, request, redirect, url_for, Response
 from database import *
 import auth
 from math import ceil
@@ -40,6 +40,18 @@ def view_author(slug):
                                                articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
                                                get_preview=get_preview, cur_page=cur_page,
                                                last_page=last_page, goto_page=goto_page)
+@author_blueprint.route('/<slug>/atom/')
+@author_blueprint.route('/<slug>/atom.xml')
+@author_blueprint.route('/<slug>/feed.xml')
+@author_blueprint.route('/<slug>/feed/')
+def author_feed(slug):
+    try:
+        author = Author.get(Author.slug == slug)
+    except Author.DoesNotExist:
+        return abort(404)
+    query = Article.select().join(ArticleTag).join(Tag).where(Article.author == author).order_by(-Article.date).limit(20)
+    return Response(render_template('atom-syndication.xml', what_here=f'posts by {author.name}', url_here=url_for('author.view_author', slug=slug, _external=True), articles=list(query), get_content=get_content), mimetype='application/atom+xml')
+
 
 @author_blueprint.route('/create/')
 def create_author():

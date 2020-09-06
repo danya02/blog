@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<feed xmlns="http://www.w3.org/2005/Atom">
+  <title>My Blog -- {{what_here}}</title>
+  <link href="{{url_here}}"/>
+  <updated>{{articles[0].date.isoformat()}}+03:00</updated>
+  <id>{{url_here}}</id>
+
+  {% for article in articles %}
+  <entry>
+    <title>{{article.title}}</title>
+    <link rel="alternate" href="{{url_for('article.view_article', slug=article.slug, _external=True)}}"/>
+    <id>{{url_for('article.view_article', slug=article.slug, _external=True)}}</id>
+    <updated>{{ article.date.isoformat() }}+03:00</updated>
+    <content type="html">
+      {{ get_content(article) }}
+    </content>
+    <author>
+      <name>{{ article.author.name }}</name>
+      <uri>{{ url_for('author.view_author', slug=article.author.slug, _external=True) }}</uri>
+    </author>
+    {% for tag in article.tags %}
+      <category term="{{tag.tag.slug}}"/>
+    {% endfor %}
+  </entry>
+  {% endfor %}
+</feed>
