@@ -6,45 +6,10 @@ Articles with tag "{{tag}}"
 Newest articles
 {% endif %}
 {% endblock %}
+{% from "navigation.html" import page_indicator, view_article %}
 
-{% set pages_displayed=5 %}{# number of page links on either side of the current position #}
-
-{% macro page_indicator() %}
-<nav aria-label="Page navigation">
-  <ul class="pagination justify-content-center">
-    {% set first_num = max(1, cur_page-pages_displayed) %}
-    {% set last_num = min(last_page, cur_page+pages_displayed) %}
-    {% if 1 != first_num %}
-    {# we are too far from the start, so display an arrow instead. #}
-    <li class="page-item">
-      <a class="page-link" href="{{goto_page(1)}}" aria-label="Go to page 1">
-        <span aria-hidden="true">&laquo;</span>
-      </a>
-    </li>
-    {% endif %}
-    {% for i in range(first_num, last_num+1) %}
-    {% if i!=cur_page %}
-    <li class="page-item"><a class="page-link" href="{{goto_page(i)}}" aria-label="Go to page {{i}}">{{i}}</a></li>
-    {% else %}
-    <li class="page-item active" aria-current="page">
-      <span class="page-link"><span class="sr-only">You are on page </span>{{i}}</span>
-    </li>
-    {% endif %}
-    {% endfor %}
-    {% if last_page != last_num %}
-    {# we are too far from the end, so display an arrow instead. #}
-    <li class="page-item">
-      <a class="page-link" href="{{goto_page(last_page)}}" aria-label="Go to last page">
-        <span aria-hidden="true">&raquo;</span>
-      </a>
-    </li>
-    {% endif %}
-  </ul>
-</nav>
-
-{% endmacro %}
 {% block body %}
-{{page_indicator()}}
+{{page_indicator(cur_page, last_page, goto_page)}}
 <h1 class="display-3">
 {% if tag %}
 Articles with <span class="badge badge-secondary">{{tag}}</span>
@@ -53,30 +18,7 @@ Newest articles
 {% endif %}
 </h1>
 {% for article in articles %}
-<div class="card my-3 anchors-without-uline">
-<a href="{{url_for('article.view_article', slug=article.slug)}}">
-    <div class="card-body">
-      <h1 class="card-title">{{article.title}}</h1>
-      {% if article.subtitle %}
-      <h2 class="card-subtitle">{{article.subtitle}}</h2>
-      {% endif %}
-      <p class="card-subtitle">Posted at {{article.date.ctime()}}</p>
-      <hr>
-  <div class="card-text {{'article-preview-fadeout' if do_fadeout(article) else ''}}">
-    {% if article.encrypted %}
-    [[ Content encrypted -- password required to view ]]
-    {% else %}
-    {{get_preview(article) | safe}}
-      {% if do_fadeout(article) %}
-      <a href="{{url_for('article.view_article', slug=article.slug)}}">
-        <div class="article-preview-fadeout-after">...</div>
-        </a>
-      {% endif %}
-    {% endif %}
-  </div>
-  </div>
-</a>
-</div>
+{{ view_article(article, get_preview) }}
 {% endfor %}
-{{page_indicator()}}
+{{page_indicator(cur_page, last_page, goto_page)}}
 {% endblock %}

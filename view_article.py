@@ -18,6 +18,7 @@ def view_article(slug):
     except Article.DoesNotExist:
         return abort(404)
     tags = [i.tag for i in article.tags.join(Tag)]
+
     next_article = None
     prev_article = None
     try:
@@ -28,6 +29,7 @@ def view_article(slug):
         next_article = Article.select(Article.slug).where(Article.listed).order_by(-Article.date).where(Article.date < article.date).get()
     except Article.DoesNotExist:
         pass
+
     if not article.encrypted:
         return render_template('view-article.html', article=article, tags=tags, can_edit=auth.can_edit(article), article_body=pandoc_article(article), next_article=next_article, prev_article=prev_article)
     else:
@@ -50,6 +52,9 @@ def view_article_source(slug):
     tags = [i.tag for i in article.tags.join(Tag)]
     if not article.encrypted:
         return Response(article.content, mimetype='text/plain')
+    prev_article = None
+    next_article = None
+
     try:
         prev_article = Article.select(Article.slug).where(Article.listed).order_by(Article.date).where(Article.date > article.date).get()
     except Article.DoesNotExist:
@@ -185,6 +190,9 @@ def delete_article(slug):
     except Article.DoesNotExist:
         return redirect(url_for('article.edit_article', slug=slug))
 
+    if not auth.can_edit(article):
+        return abort(403)
+
     if request.form['confirm'] == 'on':
         article.delete_instance()
         return redirect(url_for('index'))
@@ -207,9 +215,9 @@ def articles_by_tag(tag):
     if cur_page > last_page:
         return redirect(goto_page(last_page))
     return render_template('list-article.html', articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
-                                                do_fadeout=do_fadeout, get_preview=get_preview,
-                                                cur_page=cur_page, last_page=last_page, goto_page=goto_page,
-                                                max=max, min=min, tag=tag.slug)
+                                                get_preview=get_preview, cur_page=cur_page,
+                                                last_page=last_page, goto_page=goto_page,
+                                                tag=tag.slug)
 
 @article_blueprint.route('/admin_list/')
 def admin_article_list():

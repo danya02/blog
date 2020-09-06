@@ -11,7 +11,16 @@
   </header>
   <p>{{ author.description | safe }}</p>
   <hr>
-  <hr>
-  <p>TODO: article list</p>
+
+  {% from "navigation.html" import page_indicator, view_article %}
+
+  {{page_indicator(cur_page, last_page, goto_page)}}
+
+  {% for article in articles %}
+  {{ view_article(article, get_preview) }}
+  {% endfor %}
+
+  {{page_indicator(cur_page, last_page, goto_page)}}
+
 </article>
 {% endblock %}

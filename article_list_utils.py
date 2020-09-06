@@ -1,7 +1,7 @@
 from math import ceil
 import pypandoc
 
-ELEMENTS_PER_PAGE = 10
+ELEMENTS_PER_PAGE = 1
 
 def do_fadeout(article):
     if article.encrypted:

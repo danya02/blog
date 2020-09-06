@@ -36,9 +36,8 @@ def index():
     if cur_page > last_page:
         return redirect(goto_page(last_page))
     return render_template('article/list-article.html', articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
-                                                        do_fadeout=do_fadeout, get_preview=get_preview,
-                                                        cur_page=cur_page, last_page=last_page, goto_page=goto_page,
-                                                        max=max, min=min)
+                                                        get_preview=get_preview, cur_page=cur_page,
+                                                        last_page=last_page, goto_page=goto_page)
 
 @app.route('/database-backup.sqlite')
 def fetch_database():

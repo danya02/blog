@@ -1,6 +1,9 @@
 from flask import Blueprint, render_template, abort, request, redirect, url_for
 from database import *
 import auth
+from math import ceil
+from article_list_utils import *
+
 
 author_blueprint = Blueprint('author', __name__, template_folder='templates/author')
 
@@ -23,7 +26,20 @@ def view_author(slug):
         if auth.can_edit_user(slug):
             return redirect(url_for('author.edit_author', slug=slug))
         return abort(404)
-    return render_template('view-author.html', author=author, can_edit=auth.can_edit_user(slug))
+    query = Article.select().where(Article.author == author).order_by(-Article.date)
+    cur_page = int(request.args.get('page') or 1)
+
+    def goto_page(num):
+        return url_for('author.view_author', slug=slug, page=num)
+
+    last_page = ceil(len(query) / ELEMENTS_PER_PAGE)
+    if cur_page > last_page:
+        return redirect(goto_page(last_page))
+
+    return render_template('view-author.html', author=author, can_edit=auth.can_edit_user(slug),
+                                               articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
+                                               get_preview=get_preview, cur_page=cur_page,
+                                               last_page=last_page, goto_page=goto_page)
 
 @author_blueprint.route('/create/')
 def create_author():
