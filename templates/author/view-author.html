@@ -1,5 +1,8 @@
 {% extends "master.html" %}
 {% block title %}{{author.name}}{% endblock %}
+{% block head %}
+<link href="{{url_for('author.author_feed', slug=author.slug, _external=True)}}" type="application/atom+xml" rel="alternate" title="Posts by {{author.name}}" />
+{% endblock %}
 
 {% block body %}
 <article>

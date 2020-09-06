@@ -6,6 +6,16 @@ Articles with tag "{{tag}}"
 Newest articles
 {% endif %}
 {% endblock %}
+
+{% block head %}
+{% if tag %}
+<link href="{{url_for('article.articles_by_tag_feed', tag=tag, _external=True)}}" type="application/atom+xml" rel="alternate" title="Posts with tag &quot;{{tag}}&quot;" />
+{% else %}
+<link href="{{url_for('feed', _external=True)}}" type="application/atom+xml" rel="alternate" title="New posts" />
+{% endif %}
+{% endblock %}
+
+
 {% from "navigation.html" import page_indicator, view_article %}
 
 {% block body %}
