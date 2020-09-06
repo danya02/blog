@@ -4,8 +4,14 @@
 {% block body %}
 {% from "input_elements.html" import view_checkbox %}
   <h1>List of authors</h1>
-<table>
-  <tr><th>Slug</th><th>Name</th><th>Editor?</th></tr>
+<table class="table table-striped">
+  <thead>
+    <tr>
+      <th scope="col">Slug</th>
+      <th scope="col">Name</th>
+      <th scope="col">Editor?</th>
+    </tr>
+  </thead>
   {% for a in authors %}
   <tr>
     <td><a href="{{url_for('author.view_author', slug=a.slug)}}"><code>{{a.slug}}</code></a></td>

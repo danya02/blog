@@ -2,10 +2,17 @@
 {% block title %}File list{% endblock %}
 
 {% block body %}
-<h1>File list</h1>
-<table>
+<h1 class="display-1">File list</h1>
+<table class="table table-hover">
   {% from "input_elements.html" import view_checkbox %}
-  <tr><th>UUID</th><th>Filename</th><th>MIME type</th><th>Hash</th><th>Encrypted?</th></tr>
+  <thead>
+    <tr>
+      <th scope="col">UUID</th>
+      <th scope="col">Filename</th>
+      <th scope="col">MIME type</th>
+      <th scope="col">Hash</th>
+      <th scope="col">Encrypted?</th></tr>
+  </thead>
   {% for file in files %}
   <tr>
     <td><a href="{{url_for('file.edit_file', uuid=file.uuid)}}"><code>{{file.uuid}}</code></a></td>

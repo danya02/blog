@@ -3,9 +3,12 @@
 
 {% block body %}
 <form method="post">
-      {% if error %}<h2 class="highlighted">Error decrypting article, check password!</h2>{% endif %}
-      <h1>Before editing the article, it needs to be unlocked with the password.</h1>
-      <input type="password" name="password" required /><input type="submit" />
+      {% if error %}<p class="alert alert-danger headshake">Error decrypting article, check password!</p>{% endif %}
+      <h1 class="display-4">Before editing the article, it needs to be unlocked with the password.</h1>
+      <div class="form-group">
+        <input type="password" name="password" required class="form-control">
+        <input type="submit" class="btn btn-primary my-2" value="Unlock!">
+      </div>
       <input type="hidden" name="action" value="unlock" />
 
 </form>

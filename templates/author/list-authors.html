@@ -3,10 +3,23 @@
 
 {% block body %}
 <article>
-  <h1>List of authors</h1>
+  <h1 class="display-2">Authors</h1>
   {% for a in authors %}
-  <h3><a href="{{url_for('author.view_author', slug=a.slug)}}">{{a.name}}</a></h3>
-  <hr>
+    <div class="card my-3 anchors-without-uline">
+      <a href="{{url_for('author.view_author', slug=a.slug)}}">
+      <div class="card-body">
+        <h1 class="card-title">
+          {{a.name}}
+        </h1>
+        <p class="card-subtitle">
+          <code>{{a.slug}}</code>
+        </p>
+        <div class="card-text">
+          {{a.description}}
+        </div>
+    </div>
+  </a>
+</div>
   {% endfor %}
 </article>
 {% endblock %}

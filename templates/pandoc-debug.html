@@ -4,22 +4,22 @@
 {% block body %}
 <article>
   <header>
-    <p>This blog uses <a href="https://pandoc.org">the Pandoc document converter</a> to transform source code written in a simple markup format to HTML.</p>
+    <p class="lead">This blog uses <a href="https://pandoc.org">the Pandoc document converter</a> to transform source code written in a simple markup format to HTML.</p>
     <p>Here, you can enter code in any markup language supported by Pandoc to see how it will be rendered as an article.</p>
     <p>The text you enter here is not stored anywhere, so make sure to copy it before closing the page!</p>
     <form method="post">
-      <p>Markup language: <input type="text" name="format" value="{{ format }}"
-      <p><input type="submit" /></p>
-      <textarea name="source" rows="24" cols="80">{{ source|safe }}</textarea>
+      <p>Markup language: <input class="form-control" type="text" name="format" value="{{ format }}"></p>
+      <p><input type="submit" class="btn btn-success" value="Submit"></p>
+      <textarea name="source" class="form-control" rows="24" cols="80">{{ source|safe }}</textarea>
     </form>
   </header>
   {% if result %}
     {{result | safe}}
   {% elif error %}
-  <h2>Error encountered while rendering!</h2>
+  <h2 class="alert alert-danger headshake" role="alert">>Error encountered while rendering!</h2>
   <pre>{{error|safe}}</pre>
   {% else %}
-    <p>No markup submitted yet!</p>
+    <p class="alert alert-warning" role="alert">No markup submitted yet!</p>
   {% endif %}
 </article>
 {% endblock %}

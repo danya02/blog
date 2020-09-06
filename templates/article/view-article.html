@@ -3,15 +3,15 @@
 
 {% block body %}
 <article>
-    <header class="article-title-font">
-        <h1 class="article-title-font color-as-navbar-start">{{article.title|safe}}</h1>
-        {% if article.subtitle %}<h2 class="article-title-font color-as-navbar-end">{{article.subtitle|safe}}</h2>{% endif %}
+    <header class="jumbotron" style="padding: 1rem;">
+        <h1 class="display-3">{{article.title|safe}}</h1>
+        {% if article.subtitle %}<h2 class="display-5">{{article.subtitle|safe}}</h2>{% endif %}
         <p class="nolink">Posted by <a href="{{url_for('author.view_author', slug=article.author.slug)}}">{{article.author.name|safe}}</a> at {{article.date.ctime()}}</p>
-        <p>Original markup language: <code>{{article.format}}</code></p>
+        <p class="text-muted">Original markup language: <code>{{article.format}}</code></p>
         {% if tags %}
         <p class="nolink">Tags:
           {% for arttag in tags %}
-          <a href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>{% if not loop.last %},{% endif %}
+          <a class="badge badge-secondary" href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>
           {% endfor %}
         </p>
         {% endif %}
@@ -20,29 +20,50 @@
 
         <p class="noprint">
           {% if unlock_source %}
-          <a href="{{url_for('article.view_article', slug=article.slug)}}">View rendered article</a>
+          <a class="btn btn-primary" href="{{url_for('article.view_article', slug=article.slug)}}">View rendered article</a>
           {% else %}
-          <a href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a>
+          <a class="btn btn-primary" href="{{url_for('article.view_article_source', slug=article.slug)}}">View source</a>
           {% endif %}
-          {% if can_edit %} or <a href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}</p>
-          <p>
-            {% if prev_article %}
-              <a href="{{url_for('article.view_article', slug=prev_article.slug)}}">&lArr; Previous article</a>
-            {% endif %}
-            ||
-            {% if next_article %}
-              <a href="{{url_for('article.view_article', slug=next_article.slug)}}">Next article &rArr;</a>
-            {% endif %}
+          {% if can_edit %} or <a class="btn btn-warning" href="{{url_for('article.edit_article', slug=article.slug)}}">edit article</a>{% endif %}
+        </p>
+
+        <div class="noprint">
+          <nav aria-label="Article navigation">
+            <ul class="pagination pagination-lg justify-content-center">
+              <li class="page-item {{'disabled' if not prev_article}}">
+                {% if prev_article %}
+                <a class="page-link" href="{{url_for('article.view_article', slug=prev_article.slug)}}" aria-label="Previous article">
+                  <span aria-hidden="true">&laquo;</span>
+                </a>
+                {% else %}
+                <span class="page-link disabled" aria-hidden="true" aria-label="Previous article not available">&laquo;</span>
+                {% endif %}
+              </li>
+              <li class="page-item">
+                {% if next_article %}
+                <a class="page-link" href="{{url_for('article.view_article', slug=next_article.slug)}}" aria-label="Next article">
+                  <span aria-hidden="true">&raquo;</span>
+                </a>
+                {% else %}
+                <span class="page-link disabled" aria-hidden="true" aria-label="Next article not available">&raquo;</span>
+                {% endif %}
+              </li>
+            </ul>
+          </nav>
+        </div>
     </header>
 
     {% if encrypted %}
 
-    {% if error %}<div class="highlighted"><h3>Error while decrypting! Check password!</h3></div>{% endif %}
-    <h1>This article is encrypted! Enter password to decrypt{% if unlock_source %} <span class="highlighted">this article's source code</span>{% endif %}:</h1>
+    {% if error %}<div class="alert alert-danger headshake" role="alert">Error while decrypting! Check password!</div>{% endif %}
+    <h1 class="display-4">This article is encrypted! Enter password to decrypt{% if unlock_source %} <span class="highlighted">this article's source code</span>{% endif %}:</h1>
 
     <form method="post">
-      <input name="password" type="password" />
-      <input type="submit" />
+      <div class="form-group">
+        <input class="form-control" name="password" type="password">
+        <input class="btn btn-primary my-2" type="submit">
+      </div>
+    </form>
 
     {% else %}
 

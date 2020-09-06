@@ -2,10 +2,19 @@
 {% block title %}Article list{% endblock %}
 
 {% block body %}
-<h1>Article list</h1>
+<h1 class="display-1">Article list</h1>
 <table>
   {% from "input_elements.html" import view_checkbox %}
-  <tr><th>Slug</th><th>Title</th><th>Subtitle</th><th>Date</th><th>Author</th><th>Listed?</th><th>Encrypted?</th></tr>
+  <thead>
+    <tr>
+      <th scope="col">Slug</th>
+      <th scope="col">Title</th>
+      <th scope="col">Subtitle</th>
+      <th scope="col">Date</th>
+      <th scope="col">Author</th>
+      <th scope="col">Listed?</th>
+      <th scope="col">Encrypted?</th></tr>
+  </thead>
   {% for article in articles %}
   <tr>
     <td><a href="{{url_for('article.view_article', slug=article.slug)}}"><code>{{article.slug}}</code></a></td>

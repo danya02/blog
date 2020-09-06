@@ -3,21 +3,21 @@
 
 {% block body %}
 <form method="post" enctype="multipart/form-data">
-<p>File name (if empty, name on disk):<input type="text" name="filename" value="{{ file.filename or '' }}" /></p>
-<p>MIME type (if empty, will try to autodetect or default to <code>application/octet-stream</code>): <input name="mimetype" type="text" value="{{ file.mimetype or '' }}"/></p>
-<p>Encryption password (leave empty for unencrypted): <input type="password" name="password" value="{{password}}" /></p>
+<p><label for="filename-input">File name (if empty, name on disk)</label><input id="filename-input" type="text" class="form-control" name="filename" value="{{ file.filename or '' }}"></p>
+<p><label for="mimetype-input">MIME type (if empty, will try to autodetect or default to <code>application/octet-stream</code>)</label><input id="mimetype-input" class="form-control" name="mimetype" type="text" value="{{ file.mimetype or '' }}"></p>
+<p><label for="password">Encryption password (leave empty for unencrypted)</label><input id="password" class="form-control" type="password" name="password" value="{{password}}"></p>
 <p>Currently stored content: <a href="{{url_for('file.view_file', uuid=file.uuid)}}">{{ (file.content or '').__len__()}} bytes == {{ (file.content or '').__len__()|filesizeformat }}</a>, SHA3-512 hash: <code>{{filehash(file.hash) | safe}}</code></p>
-<p>New content: <input type="file" name="content"></p>
-<input type="submit" />
+<p><label for="new-content">New content</label><input class="form-control-file" id="new-content" type="file" name="content"></p>
+<input type="submit" class="btn btn-primary">
 
-<input type="hidden" name="action" value="edit" />
-<input type="hidden" name="old_password" value="{{password}}" />
+<input type="hidden" name="action" value="edit">
+<input type="hidden" name="old_password" value="{{password}}">
 </form>
 
-<hr><hr>
 <form method="post" action="{{url_for('file.delete_file', uuid=file.uuid)}}">
-  <p>Deleting a file cannot be undone! Are you sure? <input type="checkbox" required name="confirm" /></p>
-  <input type="submit" value="Delete this file!" />
+  <hr><hr>
+  <p><input id="confirm-delete" class="form-check-input" type="checkbox" required name="confirm"><label class="form-check-label" for="confirm-delete">This action <strong>cannot be undone</strong></label></p>
+  <input type="submit" class="btn btn-danger" value="Delete this file!">
 </form>
 
 

@@ -4,9 +4,9 @@
 {% block body %}
 <article>
   <header>
-  <h1>{{author.name}}</h1>
+  <h1 class="display-4">{{author.name}}</h1>
   {% if can_edit %}
-  <p><a href="{{url_for('author.edit_author', slug=author.slug)}}">Edit author</a></p>
+  <p><a class="btn btn-primary" href="{{url_for('author.edit_author', slug=author.slug)}}">Edit author</a></p>
   {% endif %}
   </header>
   <p>{{ author.description | safe }}</p>

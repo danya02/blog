@@ -3,17 +3,19 @@
 
 {% block body %}
 <form method="post">
-      {% if error %}<h2 class="highlighted">Error decrypting file, check password!</h2>{% endif %}
-      <h1>Before using this file, it needs to be unlocked with the password.</h1>
-      <table>
+      {% if error %}<div class="alert alert-danger" role="alert">Error decrypting file, check password!</div>{% endif %}
+      <p class="lead">Before using this file, it needs to be unlocked with the password.</p>
+      <table class="table table-striped">
         <caption>File properties</caption>
-        <tr><th>Key</th><th>Value</th></tr>
-        <tr><td>File name</td><td><code>{{file.filename}}</code></td></tr>
-        <tr><td><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">MIME type</a></td><td><code>{{file.mimetype}}</code></td></tr>
-        <tr><td>File hash</td><td><code>{{file.hash}}</code></td></tr>
+        <thead>
+          <tr><th scope="col">Key</th><th scope="col">Value</th></tr>
+        </thead>
+        <tr><th scope="row">File name</th><td><code>{{file.filename}}</code></td></tr>
+        <tr><th scope="row"><a href="https://developer.mozilla.org/en-US/docs/Web/HTTP/Basics_of_HTTP/MIME_types/Common_types">MIME type</a></th><td><code>{{file.mimetype}}</code></td></tr>
+        <tr><th scope="row">File hash</th><td><code>{{file.hash}}</code></td></tr>
       </table>
-      <input type="password" name="password" required /><input type="submit" />
-      <input type="hidden" name="action" value="unlock" />
+      <input type="password" name="password" required class="form-control"><input class="btn btn-primary" type="submit" value="Unlock">
+      <input type="hidden" name="action" value="unlock">
 
 </form>
 {% endblock %}

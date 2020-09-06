@@ -5,38 +5,83 @@
 <article>
   <form method="post">
     <header>
-        {% if wrong_version %}<h1 class="highlight">Wrong version of article submitted! Check live content to avoid overwriting edits!</h1>{% endif %}
-          <h1>Title: <input type="text" required name="title" value="{{(article.title or '')|safe}}" /></h1>
-          <h2>Subtitle: <input name="subtitle" type="text" value="{{(article.subtitle or '')|safe}}" /></h2>
-          <p>Slug: <input name="slug" type="text" value="{{article.slug}}" /></p>
-          <p>Posted by
-            <select name="author" {% if not this_user.is_editor %}disabled{% endif %}>
+        {% if wrong_version %}<div class="alert alert-danger headshake" role="alert">Wrong version of article submitted! Check live content to avoid overwriting edits!</div>{% endif %}
+          <div class="form-group">
+            <label for="title">Title</label>
+            <input id="title" class="form-control" type="text" required name="title" value="{{(article.title or '')|safe}}">
+          </div>
+          <div class="form-group">
+            <label for="subtitle">Subtitle</label>
+            <input id="subtitle" class="form-control" name="subtitle" type="text" value="{{(article.subtitle or '')|safe}}">
+          </div>
+          <div class="form-group">
+            <label for="slug">Slug</label>
+            <input name="slug" class="form-control" type="text" value="{{article.slug}}">
+          </div>
+          <div class="form-group">
+            <label for="posted-who">Posted by</label>
+            <select id="posted-who" class="form-control" name="author" {% if not this_user.is_editor %}disabled{% endif %}>
               {% for author in authors %}
               <option value="{{author.slug}}" {% if ((article.author_id != None) and (author==article.author)) or author==this_user %}selected{% endif %}>{{author.name|safe}}</option>
               {% endfor %}
             </select>
-            at <input name="time" type="time" value="{{time}}" required /> <input name="date" type="date" value="{{date}}" required/></p>
-          <p>Tags:
-            <input type="text" name="tags" value="{% for arttag in tags %}{{arttag.slug}}{% if not loop.last %},{% endif %}{% endfor %}" />
-          </p>
-          <p>Is article listed: <input type="checkbox" name="listed" {{ 'checked' if article.listed }} /></p>
-          <p>Source code is written in this format: <input type="text" name="format" value="{{article.format}}" /> </p>
-          <p>Encryption password (leave empty for unencrypted): <input type="password" name="password" value="{{password}}" /></p>
-          <p>In previews, crop at paragraph: <input type="number" name="crop_at_paragraph" min="1" value="{{article.crop_at_paragraph}}" /></p>
-          <p>In previews, crop with fading: <input type="checkbox" name="crop_with_fade" {{ 'checked' if article.crop_with_fade }} /></p>
-          <input type="submit" />
+          </div>
+          <div class="form-group row">
+            <label for="posted-time">Posted at (determines ordering)</label>
+            <input id="posted-time" class="form-control" name="time" type="time" value="{{time}}" step="0.001" required>
+            <input id="posted-date" name="date" class="form-control" type="date" value="{{date}}" required>
+            <button onclick="setPostedTime(); return false" class="btn btn-info">Set to current time</button>
+            <script>
+              var setPostedTime = function(){
+                var time = document.querySelector("#posted-time");
+                var date = document.querySelector("#posted-date");
+                var current = new Date();
+                time.valueAsDate = current;
+                date.valueAsDate = current;
+              };
+            </script>
+          </div>
+          <div class="form-group">
+            <label for="tag-list">Tags (comma-separated)</label>
+            <input id="tag-list" class="form-control" type="text" name="tags" value="{% for arttag in tags %}{{arttag.slug}}{% if not loop.last %},{% endif %}{% endfor %}">
+          </div>
+          <div class="form-group">
+            <label for="listed">Is article listed: </label>
+            <input id="listed" type="checkbox" name="listed" {{ 'checked' if article.listed }}>
+          </div>
+          <div class="form-group">
+            <label for="source-format">Source code is written in this format:</label>
+            <input id="source-format" class="form-control" type="text" name="format" value="{{article.format}}">
+          </div>
+          <div>
+            <label for="enc-pw">Encryption password (leave empty for unencrypted)</label>
+            <input id="enc-pw" class="form-control" type="password" name="password" value="{{password}}">
+          </div>
+          <div class="form-group">
+            <label for="crop-para">In previews, crop at paragraph: </label>
+            <input id="crop-para" class="form-control" type="number" name="crop_at_paragraph" min="1" value="{{article.crop_at_paragraph}}">
+          </div>
+          <div class="form-group">
+            <label for="crop-fade">In previews, crop with fading: </label>
+            <input id="crop-fade" type="checkbox" name="crop_with_fade" {{ 'checked' if article.crop_with_fade }}>
+          </div>
+          <input type="submit" class="btn btn-success" value="Save content">
       </header>
-
-      <textarea name="content" rows="24" cols="80" required>{{ article_body|safe }}</textarea>
-
-      <input type="hidden" name="version" value="{{ article.version }}" />
-      <input type="hidden" name="action" value="edit" />
+      <div class="form-group">
+        <label for="content">Article content</label>
+        <textarea id="content" class="form-control" name="content" rows="24" cols="80" required>{{ article_body|safe }}</textarea>
+      </div>
+      <input type="hidden" name="version" value="{{ article.version }}">
+      <input type="hidden" name="action" value="edit">
     </form>
 
       <hr><hr>
       <form method="post" action="{{url_for('article.delete_article', slug=article.slug)}}">
-        <p>Deleting an article cannot be undone! Are you sure? <input type="checkbox" required name="confirm" /></p>
-        <input type="submit" value="Delete this article!" />
+        <div class="form-group">
+          <label for="delete-ack">Deleting an article cannot be undone! Are you sure?</label>
+          <input id="delete-ack" type="checkbox" required name="confirm">
+        </div>
+        <input class="btn btn-danger" type="submit" value="Delete this article!">
       </form>
 
 </article>

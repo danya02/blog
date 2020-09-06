@@ -1,15 +1,15 @@
 {% macro disqus(slug, url) %}
 
-<div id="comments-section">
-
-<noscript><p>The comment section on this site is provided by <a href="https://disqus.com/?ref_noscript">Disqus.</a> Enable JavaScript to use it.</p></noscript>
+<div class="card my-3">
+<div class="card-body" id="comments-section">
+<noscript><p class="lead">The comment section on this site is provided by <a href="https://disqus.com/?ref_noscript">Disqus.</a> Enable JavaScript to use it.</p></noscript>
 
 <script>
-	document.getElementById('comments-section').innerHTML = `<p>The comment section on this site is provided by <a href="https://disqus.com/?ref_noscript">Disqus,</a> but it is disabled by default to protect your privacy. <button onclick="init_disqus();">Click here to activate comments.</button>`;
+	document.getElementById('comments-section').innerHTML = `<p class="lead">The comment section on this site is provided by <a href="https://disqus.com/?ref_noscript">Disqus,</a> but it is disabled by default to protect your privacy.</p><button class="btn btn-warning" onclick="init_disqus();">Activate comments!</button>`;
 
 var init_disqus = function(){
 	window.localStorage.setItem('disqus_enabled', 'yes');
-	document.getElementById('comments-section').innerHTML = String.raw`<p>Comments by <a href="https://disqus.com/?ref_noscript">Disqus</a> are enabled. <button onclick="deinit_disqus();">Click here to disable.</button></p><div id="disqus_thread"></div>`;
+	document.getElementById('comments-section').innerHTML = String.raw`<p class="lead">Comments by <a href="https://disqus.com/?ref_noscript">Disqus</a> are enabled. </p><button class="btn btn-success" onclick="deinit_disqus();">Disable comments</button><div id="disqus_thread"></div>`;
 	var disqus_config = function () {
 	this.page.url = "{{url}}"
 	this.page.identifier = "{{slug}}";
@@ -32,6 +32,7 @@ var deinit_disqus = function(){
 	window.location.reload(false);
 };
 </script>
+</div>
 </div>
 
 {% endmacro %}

@@ -10,8 +10,8 @@ html {
 article {
 /*  color: #444; */
   /*font-family: Georgia, Palatino, 'Palatino Linotype', Times, 'Times New Roman', serif;*/
-  font-family: serif;
-  font-size: 18px;
+  /*font-family: serif;
+  font-size: 18px;*/
 /*  line-height: 1.7;
   padding: 1em;
   margin: auto;
@@ -19,18 +19,19 @@ article {
   background: #fefefe;*/
 }
 
-
+/*
 article header h1 {
   font-size: 2.5em;
 }
 
 article header h2 {
   font-size: 2em;
-}
+}*/
 
+/*
 article header {
   border-bottom: 1px solid black;
-/*  margin: 64px; */
+  //margin: 64px;
   margin-bottom: 2em;
 }
 
@@ -46,6 +47,7 @@ article header p {
   font-size: 1.2em;
   text-indent: 0;
 }
+*/
 
 /*
 a {
@@ -90,10 +92,10 @@ a::selection {
 
 */
 
-p {
+/*p {
   margin: 1em 0;
   text-indent: 1em;
-}
+}*/
 
 img {
   max-width: 100%;

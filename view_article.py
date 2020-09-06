@@ -209,7 +209,7 @@ def articles_by_tag(tag):
     return render_template('list-article.html', articles=query.paginate(cur_page, ELEMENTS_PER_PAGE),
                                                 do_fadeout=do_fadeout, get_preview=get_preview,
                                                 cur_page=cur_page, last_page=last_page, goto_page=goto_page,
-                                                max=max, min=min)
+                                                max=max, min=min, tag=tag.slug)
 
 @article_blueprint.route('/admin_list/')
 def admin_article_list():
