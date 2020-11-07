@@ -3,11 +3,6 @@ import pypandoc
 
 ELEMENTS_PER_PAGE = 1
 
-def do_fadeout(article):
-    if article.encrypted:
-        return False
-    return article.crop_with_fade
-
 def get_preview(article):
     if article.encrypted:
         return '<b>Content encrypted. Also there was a problem with this template, this is a bug!</b>'

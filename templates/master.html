@@ -15,6 +15,23 @@
     <script src="//cdnjs.cloudflare.com/ajax/libs/highlight.js/10.1.1/highlight.min.js"></script>
     <script>hljs.initHighlightingOnLoad();</script>
     <!-- end highlight.js -->
+
+    <!-- begin style-selector -->
+    <script type="text/javascript">
+var name = window.localStorage.getItem('chosen-style');
+var url = window.localStorage.getItem('chosen-style-url');
+if(name == null || url == null) {
+    if(window.matchMedia("(prefers-color-scheme: dark)").matches) { console.log("prefers dark theme (cool!)"); name = 'Darkly'; url = "https://maxcdn.bootstrapcdn.com/bootswatch/4.3.1/darkly/bootstrap.min.css"; }
+    else { name = 'Flatly'; url = "https://maxcdn.bootstrapcdn.com/bootswatch/4.3.1/flatly/bootstrap.min.css"; }
+}
+
+var link = document.createElement( "link" );
+link.href = url;
+link.type = "text/css";
+link.rel = "stylesheet";
+
+document.getElementsByTagName( "head" )[0].appendChild( link );
+    </script>
     {% block head %}{% endblock %}
   </head>
 {#
@@ -44,26 +61,40 @@
 
   </style>
 #}
-  <body>
+  <body style="font-size:20px;">
 
 
-<nav class="navbar navbar-expand-lg navbar-light bg-light">
+<nav class="navbar navbar-expand-lg navbar-dark bg-primary">
         <a href="{{url_for('index')}}" class="navbar-brand">My Blog</a>
         <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavAltMarkup" aria-controls="navbarNavAltMarkup" aria-expanded="false" aria-label="Toggle navigation">
           <span class="navbar-toggler-icon"></span>
         </button>
 
         <div class="collapse navbar-collapse" id="navbarNavAltMarkup">
-          <a class="nav-link" href="{{url_for('pandoc_debug')}}">Pandoc</a>
-          <a class="nav-link" href="{{url_for('fetch_database')}}">Database backup</a>
-          <span class="flex-end">
+          <ul class="navbar-nav mr-auto">
+            <li class="nav-item"><a class="nav-link" href="{{url_for('author.list_authors')}}">View authors</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{url_for('pandoc_debug')}}">Pandoc</a></li>
+            <li class="nav-item"><a class="nav-link" href="{{url_for('fetch_database')}}">Database backup</a></li>
+            <li class="nav-item"><div class="dropdown">
+              <a class="nav-link dropdown-toggle" type="button" id="chooseStylesheet" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+                Choose style
+              </a>
+              <div class="dropdown-menu" aria-labelledby="chooseStylesheet" id="chooseStylesheetList">
+                <a class="dropdown-item active" href="#" onclick="setStyle(null); return false;">Use your system settings</a>
+                <div class="dropdown-divider"></div>
+                <a class="dropdown-item disabled" href="#" onclick="return false;">Style choices not loaded yet...</a>
+              </div>
+            </div></li>
+
             {% if session['user'] %}
-            <span class="nav-item dropdown">
+            <li class="nav-item"><span class="dropdown">
               <a class="nav-link dropdown-toggle" href="#" id="navbarLoginDropdown" role="button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
                 Hello {{session['user']}}
               </a>
               <div class="dropdown-menu" aria-labelledby="navbarLoginDropdown">
                 <a class="dropdown-item" href="{{url_for('creation_tools')}}">Creation tools</a>
+                <a class="dropdown-item" href="{{url_for('article.create_article')}}">Create article</a>
+                <a class="dropdown-item" href="{{url_for('file.create_file')}}">Create file</a>
                 <div class="dropdown-divider"></div>
                 <a class="dropdown-item" href="{{url_for('auth.logout')}}">Logout</a>
               </div>
@@ -72,13 +103,54 @@
             {% else %}
             <a class="nav-link" href="{{url_for('auth.authenticate')}}">Login</a>
             {% endif %}
-          </span>
-        </div>
+          </div></li>
 </nav>
 
 <div class="container">
     {% block body %}{% endblock %}
 </div>
+
+<script>
+
+var stylesheetList = document.getElementById("chooseStylesheetList");
+
+var getJSON = function(url, callback) {
+    var xhr = new XMLHttpRequest();
+    xhr.open('GET', url, true);
+    xhr.responseType = 'json';
+    xhr.onload = function() {
+      var status = xhr.status;
+      if (status === 200) {
+        callback(null, xhr.response);
+      } else {
+        callback(status, xhr.response);
+      }
+    };
+    xhr.send();
+};
+
+var name = window.localStorage.getItem('chosen-style');
+var url = window.localStorage.getItem('chosen-style-url');
+var undef = (name === null) || (url === null);
+var STYLES = {};
+
+getJSON("https://bootswatch.com/api/4.json", function(status, data) {
+    if (status === null) {
+        stylesheetList.innerHTML = '<a class="dropdown-item' + (undef?" active ":"") +  '" href="#" onclick="setStyle(null); return false;">Use your system settings</a>';
+        stylesheetList.innerHTML+= '<div class="dropdown-divider"></div>';
+        data.themes.forEach(function(theme){
+            STYLES[theme.name] = theme.cssMin;
+            stylesheetList.innerHTML += '<a class="dropdown-item' + ( (name == theme.name) ?" active ":"") +  '" href="#" onclick="setStyle(' + " '" +theme.name+ "' "   + '); return false;">' + theme.name + ' &mdash; ' + theme.description + '</a>';
+        } );
+    }
+} );
+
+function setStyle(name) { 
+    if(name === null) { window.localStorage.removeItem('chosen-style'); window.localStorage.removeItem('chosen-style-url'); }
+    else { window.localStorage.setItem('chosen-style', name); window.localStorage.setItem('chosen-style-url', STYLES[name]); }
+    window.location.reload();
+}
+</script>
 
   </body>
 </html>

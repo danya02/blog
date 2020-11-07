@@ -13,7 +13,7 @@
   {% endif %}
   </header>
   <p class="lead">Use this link in your feed reader: <a href="{{url_for('author.author_feed', slug=author.slug, _external=True)}}"><code>{{url_for('author.author_feed', slug=author.slug, _external=True)}}</code></a></p>
-  <p>{{ author.description | safe }}</p>
+  {{ author.description | safe }}
   <hr>
 
   {% from "navigation.html" import page_indicator, view_article %}

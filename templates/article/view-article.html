@@ -11,7 +11,7 @@
         {% if tags %}
         <p class="nolink">Tags:
           {% for arttag in tags %}
-          <a class="badge badge-secondary" href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>
+          <a class="badge badge-primary" href="{{url_for('article.articles_by_tag', tag=arttag.slug)}}">{{arttag.slug}}</a>
           {% endfor %}
         </p>
         {% endif %}

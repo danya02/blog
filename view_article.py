@@ -145,8 +145,6 @@ def edit_article(slug):
                     crop = article.crop_at_paragraph
                 article.crop_at_paragraph = crop
 
-                article.crop_with_fade = request.form.get('crop_with_fade')=='on'
-
                 article.encrypted = False
                 password = request.form.get('password') or ''
                 if password != '':
@@ -209,7 +207,7 @@ def articles_by_tag(tag):
     cur_page = int(request.args.get('page') or 1)
 
     def goto_page(num):
-        return url_for('article.articles_by_tag', page=num)
+        return url_for('article.articles_by_tag', page=num, tag=tag)
 
     last_page = ceil(len(query) / ELEMENTS_PER_PAGE)
     if cur_page > last_page:

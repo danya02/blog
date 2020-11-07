@@ -36,25 +36,20 @@
 {% endmacro %}
 
 {% macro view_article(article, get_preview) %}
-<div class="card my-3 anchors-without-uline">
-<a href="{{url_for('article.view_article', slug=article.slug)}}">
+<div class="card my-3">
+<a href="{{url_for('article.view_article', slug=article.slug)}}" class="text-decoration-none nav-link">
     <div class="card-body">
       <h1 class="card-title">{{article.title}}</h1>
       {% if article.subtitle %}
       <h2 class="card-subtitle">{{article.subtitle}}</h2>
       {% endif %}
-      <p class="card-subtitle">Posted at {{article.date.ctime()}}</p>
+      <p class="card-subtitle text-decoration-none">Posted at {{article.date.ctime()}}</p>
       <hr>
-  <div class="card-text {{'article-preview-fadeout' if article.crop_with_fade else ''}}">
+  <div class="card-text text-decoration-none">
     {% if article.encrypted %}
     [[ Content encrypted -- password required to view ]]
     {% else %}
     {{get_preview(article) | safe}}
-      {% if article.crop_with_fade %}
-      <a href="{{url_for('article.view_article', slug=article.slug)}}">
-        <div class="article-preview-fadeout-after">...</div>
-        </a>
-      {% endif %}
     {% endif %}
   </div>
   </div>

@@ -5,7 +5,7 @@
 <article>
   <h1 class="display-2">Authors</h1>
   {% for a in authors %}
-    <div class="card my-3 anchors-without-uline">
+    <div class="card my-3 text-decoration-none">
       <a href="{{url_for('author.view_author', slug=a.slug)}}">
       <div class="card-body">
         <h1 class="card-title">
@@ -15,7 +15,7 @@
           <code>{{a.slug}}</code>
         </p>
         <div class="card-text">
-          {{a.description}}
+          {{a.description | safe}}
         </div>
     </div>
   </a>
